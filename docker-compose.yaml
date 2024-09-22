@@ -1,0 +1,40 @@
+services:
+    postgres:
+        image: postgres:latest
+        environment:
+            DB_HOST: postgres
+            DB_USER: some_user     # Замените на ваше имя пользователя PostgreSQL
+            DB_PASSWORD: secret     # Замените на ваш пароль PostgreSQL
+            DB_NAME: table-db           # Замените на ваше имя базы данных
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    backend:
+        build:
+            context: ./backend                 # Путь к вашему бэкенду
+        ports:
+            - "3000"                            # Порт вашего сервера Express
+        environment:
+            DB_HOST: postgres                   # Указываем имя сервиса PostgreSQL как хост
+            DB_USER: some_user                  # Укажите имя пользователя
+            DB_PASS: secret                      # Укажите пароль
+            DB_NAME: table-db                   # Укажите имя базы данных
+        depends_on:
+            - postgres                          # Зависимость от контейнера PostgreSQL
+
+    frontend:
+        build:
+            context: ./frontend                # Путь к вашему фронтенду (Vite)
+        ports:
+            - "5173:5173"                      # Порт вашего приложения Vite
+
+    nginx:
+        build:
+            context: ./frontend               # Используем тот же контекст, что и для фронтенда, чтобы получить Dockerfile и nginx.conf
+        ports:
+            - "80:80"                          # Порт для доступа к Nginx
+
+volumes:
+    postgres_data:
