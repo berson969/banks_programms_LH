@@ -1,40 +1,51 @@
 import  {useState} from 'react';
-import AddButton from "../AddButton.jsx";
-import { updateColumnNameAsync, deleteColumnAsync } from "../../thunks/index.js";
-import {useDispatch} from "react-redux";
 import PropTypes from "prop-types";
+import {useDispatch} from "react-redux";
+import { updateColumnAsync, deleteColumnAsync } from "../../thunks";
+import AddButton from "../AddButton";
+
 
 function ColumnNameInput({ column }) {
     const dispatch = useDispatch();
     const [name, setName] = useState(column.name);
 
-    const handleSaveNameColumn = () => {
+    const handleSaveNameColumn = (e) => {
+        e.preventDefault();
         if (name !== column.name) {
             const updateColumn = {
                 ...column,
                 name
             }
 
-            dispatch(updateColumnNameAsync(updateColumn));
+            dispatch(updateColumnAsync(updateColumn));
         }
     };
 
-    const handleRemoveColumn = () => {
+    const handleRemoveColumn = (e) => {
+        e.preventDefault();
         dispatch(deleteColumnAsync(column.id));
     };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSaveNameColumn(e);
+        }
+    };
+
     return (
         <div className="column-input">
-            <label htmlFor={`columnName-${column.id}`}>Column Name:</label>
+            <label htmlFor={`columnName-${column.id}`} >Column Name:</label>
             <input
                 id={`columnName-${column.id}`}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e)}
                 placeholder="Enter column name"
             />
             <div>
-                <AddButton onClick={handleSaveNameColumn} text="Save" />
-                <AddButton onClick={handleRemoveColumn} text="Remove" />
+                <AddButton onClick={(e) => handleSaveNameColumn(e)} text="Save" />
+                <AddButton onClick={(e) => handleRemoveColumn(e)} text="Remove" />
             </div>
         </div>
     );

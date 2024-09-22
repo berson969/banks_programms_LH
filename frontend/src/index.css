@@ -47,69 +47,6 @@ h1 {
   color: black;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-th, td {
-  border: 1px solid #dee2e6;
-  padding: 0;
-  text-align: left;
-}
-
-th {
-  background-color: #e9ecef;
-  text-align: center;
-}
-
-tr {
-  position: relative;
-}
-
-.deleteRow {
-  width: 0;
-  position: absolute;
-  left: 0px;
-  text-align: center;
-  margin-left: -30px;
-  padding: 0;
-  border: none;
-}
-
-select {
-  width: 100%;
-  padding: 0 5px;
-  box-sizing: border-box;
-}
-
-.column-input {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.value-input {
-  width: 100%;
-  flex: 1;
-}
-
-button {
-  margin: 5px;
-  padding: 10px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
 ul {
   list-style-type: none;
   margin: 0;

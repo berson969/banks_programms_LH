@@ -1,13 +1,14 @@
 import  {useState} from 'react';
 import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
-import {selectUser} from "../../slices/index.js";
+import {selectUser} from "../../slices";
 
 function RowCell ({ column, value, onChange }) {
     const [currentValue, setCurrentValue] = useState(value || '');
     const { role } = useSelector(selectUser);
 
     const handleChange = (e) => {
+        e.preventDefault();
         setCurrentValue(e.target.value);
         onChange(column.id, e.target.value);
     };

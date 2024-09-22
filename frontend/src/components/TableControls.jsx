@@ -5,11 +5,13 @@ import AddButton from "./AddButton";
 const TableControls = () => {
     const dispatch = useDispatch();
 
-    const handleAddColumn = () => {
+    const handleAddColumn = (e) => {
+        e.preventDefault()
         dispatch(addColumnAsync());
     };
 
-    const handleAddRow = () => {
+    const handleAddRow = (e) => {
+        e.preventDefault()
         dispatch(addRowAsync());
     };
 

@@ -34,7 +34,6 @@ function Table() {
             : rows;
 
         setFilteredRows(newFilteredRows)
-        console.log("filteredRows", newFilteredRows)
     }, [filters, rows])
 
 

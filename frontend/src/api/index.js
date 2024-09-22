@@ -15,6 +15,7 @@ export const addColumn = async (column) => {
 export const updateColumn = async (column) => {
     console.log("columnUPDATE", column)
     const response = await axios.put(`${API_URL}/columns/${column.id}`, column);
+    console.log("Already columnUPDATE", response.data)
     return response.data;
 };
 

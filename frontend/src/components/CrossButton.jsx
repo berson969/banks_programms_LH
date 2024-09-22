@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 function CrossButton({ onRemoveValue, index }) {
     return <button
-        onClick={() => onRemoveValue(index)}
+        onClick={(e) => onRemoveValue(e, index)}
         className="cross-button"
     >
         ×

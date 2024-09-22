@@ -33,17 +33,14 @@ export const tableSlice = createSlice({
             state.status = 'succeeded';
         },
         addColumnName: (state, action) => {
-            state.columns.push({
-                id: action.payload.id,
-                name: action.payload.name,
-                createdAt: new Date().toISOString(),
-                values: []
-            });
-            state.columns = sortedColumns(state.columns)
+            const newColumns = [...state.columns, action.payload];
+            state.columns = sortedColumns(newColumns)
+            console.log("addColumnName", state.columns )
         },
         removeColumn: (state, action) => {
-            state.columns = state.columns.filter(column => column.id !== action.payload);
-            state.columns = sortedColumns(state.columns);
+            const newColumns = state.columns.filter(column => column.id !== action.payload);
+            state.columns = sortedColumns(newColumns);
+            console.log("removeColumn", state.columns )
         },
         updateColumnName: (state, action) => {
             const index = state.columns.findIndex(column => column.id === action.payload.id);
@@ -56,8 +53,9 @@ export const tableSlice = createSlice({
             state.columns = sortedColumns(state.columns);
         },
         updateValueInColumn: (state, action) => {
-            state.columns = state.columns.map(col => col.id === action.payload.id ? action.payload : col);
-            state.columns = sortedColumns(state.columns);
+            const newColumns = state.columns.map(col => col.id === action.payload.id ? action.payload : col);
+            state.columns = sortedColumns(newColumns);
+            console.log("updateColumnName", state.columns )
         },
         removeValueFromColumn: (state, action) => {
             const {id, valueToRemove} = action.payload;

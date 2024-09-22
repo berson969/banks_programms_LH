@@ -47,7 +47,7 @@ export const addColumnAsync = () => async (dispatch) => {
             values: []
         };
         const newColumn = await addColumn(column);
-        console.log('newCol-add', newColumn.id)
+        // console.log('newCol-add', newColumn.id)
         dispatch(addColumnName(newColumn));
         dispatch(setLoading('idle'));
     } catch (error) {
@@ -57,7 +57,7 @@ export const addColumnAsync = () => async (dispatch) => {
     }
 };
 
-export const updateColumnNameAsync = (column) => async (dispatch) => {
+export const updateColumnAsync = (column) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
         console.log('updatedColumn-thunks', column.id)

@@ -7,7 +7,7 @@ function Columns({ column }) {
 
     // console.log('updateColumn', column.id)
     return (
-        <div className="column-view">
+        <div  className="column-view">
             <ColumnNameInput
                 column={column}
             />

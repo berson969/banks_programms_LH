@@ -9,7 +9,8 @@ import CrossButton from "../CrossButton";
 function ValuesList({ id, values }) {
     const dispatch = useDispatch();
 
-    const handleRemoveValue = (valueToRemove) => {
+    const handleRemoveValue = (e, valueToRemove) => {
+        e.preventDefault()
         console.log('removeValue', valueToRemove, id)
         dispatch(removeValueFromColumnAsync(
             id,
@@ -22,7 +23,7 @@ function ValuesList({ id, values }) {
             {values && values.map((value, index) => (
                 <li key={index}>
                     <ValueInput id={id} value={value}  />
-                    <CrossButton onRemoveValue={() => handleRemoveValue(value)} index={index.toString()} />
+                    <CrossButton onRemoveValue={(e) => handleRemoveValue(e, value)} index={index.toString()} />
                 </li>
             ))}
         </ul>
