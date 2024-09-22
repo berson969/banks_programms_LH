@@ -2,10 +2,9 @@ services:
     postgres:
         image: postgres:latest
         environment:
-            DB_HOST: postgres
-            DB_USER: some_user     # Замените на ваше имя пользователя PostgreSQL
-            DB_PASSWORD: secret     # Замените на ваш пароль PostgreSQL
-            DB_NAME: table-db           # Замените на ваше имя базы данных
+            POSTGRES_USER: some_user     # Замените на ваше имя пользователя PostgreSQL
+            POSTGRES_PASSWORD: secret     # Замените на ваш пароль PostgreSQL
+            POSTGRES_NAME: table-db           # Замените на ваше имя базы данных
         ports:
             - "5432:5432"
         volumes:

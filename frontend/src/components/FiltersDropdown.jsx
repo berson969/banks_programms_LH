@@ -52,7 +52,10 @@ function FiltersDropdown({ column }) {
                     <div>
                         {column.values.map((value, index) => (
                             <div key={index}>
-                                <label htmlFor={`checkbox-${index}`}>
+                                <label
+                                    htmlFor={`checkbox-${index}`}
+                                    className="label-filter-input"
+                                >
                                     <input
                                         id={`checkbox-${index}`}
                                         type="checkbox"
