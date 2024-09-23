@@ -1,5 +1,5 @@
 # Используем Node.js как базовый образ
-FROM node:14 as build
+FROM node:latest AS build
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -13,10 +13,10 @@ COPY .. .
 
 # Собираем приложение Vite
 RUN npm run build
-RUN ls -la .
+
 # Используем Nginx как базовый образ для сервинга приложения
 FROM nginx:alpine
-
+#RUN ls -la /usr/share/nginx/html
 # Копируем скомпилированные файлы из предыдущего этапа в директорию Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 

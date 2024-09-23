@@ -6,7 +6,10 @@ import cors from 'cors';
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: ['http://vite:5173', 'http://localhost:5173',  'http://localhost', 'http://91.109.202.105', ],
+    credentials: true,
+}));
 app.use(express.json());
 
 // Инициализация PostgreSQL
@@ -303,7 +306,7 @@ app.delete('/api/rows/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
