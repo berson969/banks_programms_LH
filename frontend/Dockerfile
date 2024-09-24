@@ -16,7 +16,7 @@ RUN npm run build
 
 # Используем Nginx как базовый образ для сервинга приложения
 FROM nginx:alpine
-#RUN ls -la /usr/share/nginx/html
+RUN apk add --no-cache curl
 # Копируем скомпилированные файлы из предыдущего этапа в директорию Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
