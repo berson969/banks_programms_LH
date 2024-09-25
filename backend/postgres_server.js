@@ -7,8 +7,7 @@ import cors from 'cors';
 
 const app = express();
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost', 'http://localhost/assets', 'http://ngnix',  'http://91.109.202.105', ],
-    credentials: true,
+    origin: ['http://localhost:5173', 'http://localhost', 'http://ngnix',  'http://91.109.202.105', ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'XSRF-TOKEN']
 }));
@@ -50,6 +49,8 @@ const Column = sequelize.define('Column', {
         defaultValue: []
     }
 });
+
+
 
 // Определение модели для строк
 const Row = sequelize.define('Row', {

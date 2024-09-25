@@ -1,7 +1,7 @@
-/* global process */
 import axios from 'axios';
 
-const API_HOST = process.env.REACT_APP_API_HOST || 'localhost';
+const API_HOST = import.meta.env.VITE_API_HOST || '91.109.202.105';
+console.log(" API_HOST" ,  API_HOST);
 const API_URL = `http://${API_HOST}:3000/api`;
 
 export const getColumns = async () => {
