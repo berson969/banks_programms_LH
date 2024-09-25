@@ -29,6 +29,8 @@ services:
         build:
             context: ./frontend                # Путь к вашему фронтенду (Vite)
         container_name: frontend
+        environment:
+            API_HOST: backend
         ports:
             - "5173:5173"                      # Порт вашего приложения Vite
 #
@@ -36,7 +38,7 @@ services:
     nginx:
         build:
             context: ./frontend               # Используем тот же контекст, что и для фронтенда, чтобы получить Dockerfile и nginx.conf
-        container_name: proxy
+        container_name: nginx
         ports:
             - "80:80"                          # Порт для доступа к Nginx
         depends_on:
