@@ -1,18 +1,14 @@
 import PropTypes from 'prop-types';
 import {useDispatch} from "react-redux";
-import {removeValueFromColumnAsync, updateValueToColumnAsync} from "../../thunks";
+import {removeValueFromColumnAsync} from "../../thunks";
 
 import ValueInput from "./ValueInput";
 import CrossButton from "../CrossButton";
-// import EditButton from "./EditButton.jsx";
+
 
 function ValuesList({ Values }) {
     const dispatch = useDispatch();
 
-    // const handleEditValue = (e, values) => {
-    //     e.preventDefault();
-    //     dispatch(updateValueToColumnAsync(values.id, values.value));
-    // }
     const handleRemoveValue = (e, id) => {
         e.preventDefault()
         dispatch(removeValueFromColumnAsync(id));
@@ -23,7 +19,6 @@ function ValuesList({ Values }) {
             {Values && Values.map(values => (
                 <li key={values.id}>
                     <ValueInput  values={values} />
-                    {/*<EditButton onEditValue={(e) => handleEditValue(e, values)} />*/}
                     <CrossButton onRemoveValue={(e) => handleRemoveValue(e, values.id)} index={values.id} />
                 </li>
             ))}
