@@ -10,19 +10,42 @@ export const getColumns = async () => {
 };
 
 export const addColumn = async (column) => {
-    const response = await axios.post(`${API_URL}/columns`, column);
+    // name
+    const response = await axios.post(`${API_URL}/columns`, column, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
     return response.data;
 };
 
 export const updateColumn = async (column) => {
-    console.log("columnUPDATE", column)
+    // id column, name, createdAt
     const response = await axios.put(`${API_URL}/columns/${column.id}`, column);
-    console.log("Already columnUPDATE", response.data)
     return response.data;
 };
 
 export const deleteColumn = async (id) => {
-    await axios.delete(`${API_URL}/columns/${id}`);
+    const response = await axios.delete(`${API_URL}/columns/${id}`);
+    return response.data;
+};
+
+export const addValues = async (values) => {
+      // id values не обязательно, columnId, value
+    const response = await axios.post(`${API_URL}/values`, values);
+    return response.data;
+};
+
+export const updateValues = async (updateValues) => {
+    // id values, value
+    const response = await axios.put(`${API_URL}/values/${updateValues.id}`, updateValues);
+    return response.data;
+};
+
+export const deleteValues = async (id) => {
+    // values.id
+    const response = await axios.delete(`${API_URL}/values/${id}`);
+    return response.data;
 };
 
 export const getRows = async () => {
@@ -30,18 +53,30 @@ export const getRows = async () => {
     return response.data;
 };
 
-export const addRow = async (row) => {
-    const response = await axios.post(`${API_URL}/rows`, row);
-    return response.data;
+export const addRow = async () => {
+    const response = await axios.post(`${API_URL}/rows`);
+    if (response.status === 201) {
+        return response.data;
+    } else {
+        return null;
+    }
 };
 
-export const updateRow = async (rowData) => {
-    const response = await axios.put(`${API_URL}/rows/${rowData.rowId}`, rowData);
+export const updateRow = async (cellData) => {
+    // rowId, columnId, valuesId
+    const response = await axios.put(`${API_URL}/rows/${cellData.rowId}`, cellData);
     return response.data;
 };
 
 export const deleteRow = async (id) => {
+    // id row
     const response = await axios.delete(`${API_URL}/rows/${id}`);
+    return response.data;
+};
+
+export const deleteCell = async (cellData) => {
+    // id cellId
+    const response = await axios.delete(`${API_URL}/cells/${cellData.id}`);
     return response.data;
 };
 

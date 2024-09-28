@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Инициализация PostgreSQL
 const sequelize = new Sequelize(
-    process.env.DB_NAME || 'table-db',
+    process.env.DB_NAME || 'table-db-new',
     process.env.DB_USER || 'some_user',
     process.env.DB_PASS || 'secret',
     {
@@ -43,14 +43,28 @@ const Column = sequelize.define('Column', {
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
-    },
-    values: {
-        type: DataTypes.JSONB,
-        defaultValue: []
     }
 });
 
-
+const Values = sequelize.define('Values', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
+    columnId: {
+        type: DataTypes.UUID,
+        references: {
+            model: Column,
+            key: 'id'
+        },
+        allowNull: false
+    },
+    value: {
+        type: DataTypes.STRING,
+        defaultValue: ''
+    }
+})
 
 // Определение модели для строк
 const Row = sequelize.define('Row', {
@@ -65,7 +79,12 @@ const Row = sequelize.define('Row', {
     }
 });
 
-const CellValues = sequelize.define('CellValues', {
+const Cells = sequelize.define('Cells', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     rowId: {
         type: DataTypes.UUID,
         references: {
@@ -73,7 +92,6 @@ const CellValues = sequelize.define('CellValues', {
             key: 'id'
         },
         allowNull: false,
-        primaryKey: true
     },
     columnId: {
         type: DataTypes.UUID,
@@ -82,19 +100,27 @@ const CellValues = sequelize.define('CellValues', {
             key: 'id'
         },
         allowNull: false,
-        primaryKey: true
     },
-    cellValue: {
-        type: DataTypes.STRING,
-        defaultValue: ''
+    valuesId: {
+        type: DataTypes.UUID,
+        references: {
+            model: Values,
+            key: 'id'
+        },
+        allowNull: false
     }
 })
 
 // Устанавливаем связи
-Column.hasMany(CellValues, { foreignKey: 'columnId' });
-Row.hasMany(CellValues, { foreignKey: 'rowId', as: 'cellValues' })
-CellValues.belongsTo(Column, { foreignKey: 'columnId' });
-CellValues.belongsTo(Row, { foreignKey: 'rowId' });
+Column.hasMany(Cells, { foreignKey: 'columnId' });
+Column.hasMany(Values, { foreignKey: 'columnId' });
+Row.hasMany(Cells, { foreignKey: 'rowId', as: 'cellValues' });
+Values.hasMany(Cells, { foreignKey: 'valuesId' });
+
+Values.belongsTo(Column, { foreignKey: 'columnId' });
+Cells.belongsTo(Column, { foreignKey: 'columnId' });
+Cells.belongsTo(Row, { foreignKey: 'rowId' });
+Cells.belongsTo(Values, { foreignKey: 'valuesId' });
 
 // Синхронизация моделей с базой данных
 sequelize.sync().then(() => {
@@ -126,7 +152,11 @@ app.post('/api/password', async (req, res) => {
 app.get('/api/columns', async (req, res) => {
     try {
         const columns = await Column.findAll({
-            order: [['createdAt', 'DESC']]
+            order: [['createdAt', 'DESC']],
+            include: [{
+                model: Values,
+                required: false
+            }]
         });
         res.json(columns);
     } catch (error) {
@@ -137,8 +167,17 @@ app.get('/api/columns', async (req, res) => {
 
 app.post('/api/columns', async (req, res) => {
     try {
-        const newColumn = await Column.create(req.body);
-        res.json(newColumn);
+        const column = await Column.create(req.body);
+        const newColumn = await Column.findByPk(column.id,
+            {
+                include: [{
+                    model: Values,
+                    required: false
+                }]
+            }
+        );
+
+        res.status(201).json(newColumn);
     } catch (error) {
         console.error('Error adding column:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -150,25 +189,14 @@ app.put('/api/columns/:id', async (req, res) => {
         const [updated] = await Column.update(req.body, {
             where: { id: req.params.id }
         });
-
         if (updated) {
-            const newValues = req.body.values || [];
-            console.log('newValues', req.body)
-            await Column.update(
-                { values: newValues },
-                { where: { id: req.params.id } }
-            );
-            await CellValues.update(
-                { cellValue: '' },
+            const updatedColumn = await Column.findByPk(req.params.id,
                 {
-                    where: {
-                        columnId: req.params.id,
-                        cellValue: { [Op.notIn]: newValues }
-                    }
+                    include: [{
+                        model: Values,
+                        required: false
+                    }]
                 });
-
-            const updatedColumn = await Column.findByPk(req.params.id,);
-            console.log('updatedColumn', updatedColumn)
             res.json(updatedColumn);
         } else {
             res.status(404).json({ message: 'Column not found' });
@@ -185,12 +213,17 @@ app.delete('/api/columns/:id', async (req, res) => {
             where: { id: req.params.id }
         });
         if (deleted) {
-            await CellValues.update(
-                { cellValue: '' },
+            await Cells.destroy(
                 { where: { columnId: req.params.id } }
             );
-
-            res.status(204).send();
+            const updatedColumns = await Column.findAll({
+                order: [['createdAt', 'DESC']],
+                include: [{
+                    model: Values,
+                    required: false
+                }]
+            });
+            res.json(updatedColumns);
         } else {
             res.status(404).json({ message: 'Column not found' });
         }
@@ -200,23 +233,93 @@ app.delete('/api/columns/:id', async (req, res) => {
     }
 });
 
+app.post('/api/values/', async (req, res) => {
+    try {
+        const updated = await Column.findByPk(req.body.columnId);
+        if (updated) {
+            const newValue = await Values.create({
+               id: req.body.id,
+               columnId: req.body.columnId,
+               value: req.body.value,
+            });
+            const updatedColumns = await Column.findAll({
+                order: [['createdAt', 'DESC']],
+                include: [{
+                    model: Values,
+                    required: false
+                }]
+            });
+            res.json(updatedColumns);
+        } else {
+            res.status(404).json({ message: 'Column not found' });
+        }
+    } catch (error) {
+        console.error('Error create value:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.put('/api/values/:id', async (req, res) => {
+    try {
+        const updateValue = await Values.findByPk(req.params.id);
+        if (updateValue) {
+            updateValue.value = req.body.value;
+            await updateValue.save();
+            const updatedColumns = await Column.findAll({
+                order: [['createdAt', 'DESC']],
+                include: [{
+                    model: Values,
+                    required: false
+                }]
+            });
+            res.json(updatedColumns);
+        } else {
+            res.status(404).json({ message: 'Value not found' });
+        }
+    }  catch (error) {
+        console.error('Error update value:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/api/values/:id', async (req, res) => {
+    try {
+        const deleted = await Values.destroy({
+            where: { id: req.params.id }
+        });
+        if (deleted) {
+            const updatedColumns = await Column.findAll({
+                order: [['createdAt', 'DESC']],
+                include: [{
+                    model: Values,
+                    required: false
+                }]
+            });
+            res.json(updatedColumns);
+        } else {
+            res.status(404).json({ message: 'Value not found' });
+        }
+
+    } catch (error) {
+        console.error('Error delete value:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 app.get('/api/rows', async (req, res) => {
     try {
         const rows = await Row.findAll({
             include: [{
-                model: CellValues,
-                as: 'cellValues'
+                model: Cells,
+                as: 'cellValues',
+                include: [{
+                    model: Values,
+                    required: false
+                }]
             }],
             order: [['createdAt', 'ASC']]
         });
-        const formattedRows = rows.map(row => {
-            return {
-                id: row.id,
-                createdAt: row.createdAt,
-                cellValues: row.cellValues
-            };
-        });
-        res.json(formattedRows);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching rows:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -225,26 +328,34 @@ app.get('/api/rows', async (req, res) => {
 
 app.post('/api/rows', async (req, res) => {
     try {
-        const newRow = await Row.create(req.body);
-
-        if (req.body.cellValues) {
-
-            const cellValuesArray = Object.entries(req.body.cellValues).map(([columnId, value]) => ({
-                rowId: newRow.id,
-                columnId: columnId,
-                cellValue: value
-                })
-            )
-            await CellValues.bulkCreate(cellValuesArray);
-        }
-        const createdRow = await Row.findByPk(newRow.id, {
+        const rows = await Row.findAll({
             include: [{
-                model: CellValues,
-                as: 'cellValues'
+                model: Cells,
+                as: 'cellValues',
+                include: [{
+                    model: Values,
+                    required: false
+                }]
             }]
-        });
-        console.log('createdRow', createdRow);
-        res.json(createdRow);
+        })
+        const emptyRows = rows.filter(row => row.cellValues.length === 0);
+        if (emptyRows.length > 0) {
+            res.status(204).send();
+        } else {
+            const newRow = await Row.create();
+
+            const createdRow = await Row.findByPk(newRow.id, {
+                include: [{
+                    model: Cells,
+                    as: 'cellValues',
+                    include: [{
+                        model: Values,
+                        required: false
+                    }]
+                }]
+            });
+            res.status(201).json(createdRow);
+        }
     } catch (error) {
         console.error('Error adding row:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -253,23 +364,39 @@ app.post('/api/rows', async (req, res) => {
 
 app.put('/api/rows/:id', async (req, res) => {
     try {
-        const {rowId, columnId, value} = req.body
+
+        const { columnId, valuesId } = req.body;
+
         const updateRow = await Row.findByPk(req.params.id);
 
         if (updateRow) {
-            await CellValues.upsert({
-                rowId,
-                columnId,
-                cellValue: value
-            });
-            const updatedRows = await Row.findAll( {
-                include: [{
-                    model: CellValues,
-                    as: 'cellValues'
-                }]
-            });
-            res.json(updatedRows);
-            console.log('updatedRow', updatedRows);
+            const [cell] = await Cells.findAll(
+                { where: {
+                    rowId: updateRow.id,
+                    columnId: columnId,
+                    valuesId: valuesId
+                }}
+            );
+            if (!cell) {
+                const createCell = await Cells.create({
+                    rowId: updateRow.id,
+                    columnId,
+                    valuesId
+                });
+                const updatedRows = await Row.findAll( {
+                    include: [{
+                        model: Cells,
+                        as: 'cellValues',
+                        include: [{
+                            model: Values,
+                            required: false
+                        }]
+                    }]
+                });
+                res.json(updatedRows);
+            } else {
+                res.status(409).json({ message: 'Value already exits' });
+            }
         } else {
             res.status(404).json({ message: 'Row not found' });
         }
@@ -281,8 +408,7 @@ app.put('/api/rows/:id', async (req, res) => {
 
 app.delete('/api/rows/:id', async (req, res) => {
     try {
-
-        await CellValues.destroy({
+        await Cells.destroy({
             where: { rowId: req.params.id }
         });
 
@@ -293,17 +419,47 @@ app.delete('/api/rows/:id', async (req, res) => {
         if (deleted) {
             const updatedRows = await Row.findAll( {
                 include: [{
-                    model: CellValues,
-                    as: 'cellValues'
+                    model: Cells,
+                    as: 'cellValues',
+                    include: [{
+                        model: Values,
+                        required: false
+                    }]
                 }]
             });
             res.json(updatedRows);
-            console.log('deletedRow', updatedRows);
         } else {
             res.status(404).json({ message: 'Row not found' });
         }
     } catch (error) {
         console.error('Error deleting row:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/api/cells/:id', async (req, res) => {
+    try {
+        console.log("cellData", req.params.id);
+        const deleted = Cells.destroy({
+            where: { id: req.params.id }
+        });
+        if (deleted) {
+            const updatedRows = await Row.findAll( {
+                include: [{
+                    model: Cells,
+                    as: 'cellValues',
+                    include: [{
+                        model: Values,
+                        required: false
+                    }]
+                }]
+            });
+            res.json(updatedRows);
+        } else {
+            res.status(404).json({message: 'Cell not found'});
+        }
+    } catch (error) {
+        console.error('Error deleting cell:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

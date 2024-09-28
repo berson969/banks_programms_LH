@@ -2,6 +2,11 @@ import {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {login, logout, setError, setLoading} from '../slices';
 import {checkPassword} from "../api";
+import {
+    getDataFromLocalStorage,
+    removeDataFromLocalStorage,
+    saveDataToLocalStorage
+} from "../../localStorageService";
 
 function LoginForm () {
     const dispatch = useDispatch();
@@ -9,16 +14,16 @@ function LoginForm () {
     const [password, setPassword] = useState('');
 
     useEffect(() => {
-        const loginData = localStorage.getItem('loginData');
+        const loginData = getDataFromLocalStorage('loginData');
         if (loginData) {
-            const { loginTime, role } = JSON.parse(loginData);
+            const { loginTime, role } = loginData;
             if (loginTime) {
                 const currentTime = Date.now();
                 const elapsedTime = currentTime - loginTime;
 
                 if (elapsedTime > 6 * 1000) {
                     dispatch(logout());
-                    localStorage.removeItem('loginTime');
+                    removeDataFromLocalStorage('loginTime');
                 } else {
                     dispatch(login(role));
                 }
@@ -38,7 +43,7 @@ function LoginForm () {
                     role: response.role
                 };
                 dispatch(login(response.role));
-                localStorage.setItem('loginData', JSON.stringify(loginData));
+                saveDataToLocalStorage('loginData', loginData);
             } else {
                 dispatch(setLoading('unauthorized'));
             }

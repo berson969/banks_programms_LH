@@ -10,6 +10,7 @@ import Table from "./components/Table";
 import Columns from "./components/columns/Columns";
 import TableControls from "./components/TableControls";
 import LoginForm from "./components/LoginForm";
+import ClearFilters from "./components/ClearFilters";
 
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
               ))}
             </div>}
         {isAuthenticated && role === "admin" && <TableControls />}
+        {isAuthenticated && <ClearFilters />}
         {isAuthenticated  && columns && columns.length > 0 && <Table columns={columns} />}
       </div>
   )

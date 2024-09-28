@@ -4,18 +4,17 @@ import ValuesList from './ValuesList';
 import AddValueInput from './AddValueInput';
 
 function Columns({ column }) {
-
-    // console.log('updateColumn', column.id)
+    // console.log('updateColumn-Columns', column, column.id)
     return (
         <div  className="column-view">
             <ColumnNameInput
+                id={`name-${column.id}`}
                 column={column}
             />
             <ValuesList
-                id={column.id}
-                values={column.values}
+                Values={column.Values}
             />
-            <AddValueInput id={column.id} />
+            <AddValueInput column={column} />
         </div>
     );
 }
@@ -24,7 +23,13 @@ Columns.propTypes = {
     column: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        values: PropTypes.arrayOf(PropTypes.string).isRequired
+        Values: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string,
+                columnId: PropTypes.string,
+                value: PropTypes.string
+            })
+        )
     }).isRequired
 };
 

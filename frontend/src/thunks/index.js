@@ -4,23 +4,21 @@ import {
     addColumn,
     updateColumn,
     deleteColumn,
+    addValues,
+    updateValues,
+    deleteValues,
     addRow,
     updateRow,
-    deleteRow
+    deleteRow,
+    deleteCell
 } from '../api';
 import {
     setColumns,
-    addColumnName,
-    removeColumn,
-    updateColumnName,
-    updateValueInColumn,
-    removeValueFromColumn,
+    changeColumn,
     setLoading,
     setError,
-    selectColumns,
     setRows,
-    addRowValue,
-    selectRows,
+    createRow,
 } from '../slices';
 
 
@@ -28,7 +26,6 @@ export const fetchColumns = () => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
         const columns = await getColumns();
-        console.log("fetchColumns", columns)
         dispatch(setColumns(columns));
         dispatch(setLoading('idle'));
     } catch (error) {
@@ -42,13 +39,10 @@ export const addColumnAsync = () => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
         const column = {
-            name: '',
-            createdAt: new Date().toISOString(),
-            values: []
+            name: ''
         };
         const newColumn = await addColumn(column);
-        // console.log('newCol-add', newColumn.id)
-        dispatch(addColumnName(newColumn));
+        dispatch(changeColumn(newColumn));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -60,9 +54,8 @@ export const addColumnAsync = () => async (dispatch) => {
 export const updateColumnAsync = (column) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        console.log('updatedColumn-thunks', column.id)
         await updateColumn(column)
-        dispatch(updateColumnName(column));
+        dispatch(changeColumn(column));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -74,8 +67,8 @@ export const updateColumnAsync = (column) => async (dispatch) => {
 export const deleteColumnAsync = (id) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        await deleteColumn(id);
-        dispatch(removeColumn(id));
+        const columns = await deleteColumn(id);
+        dispatch(setColumns(columns));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -83,25 +76,15 @@ export const deleteColumnAsync = (id) => async (dispatch) => {
     }
 };
 
-export const updateValueToColumnAsync = (id, newValue, oldValue='') => async (dispatch, getState) => {
+export const addValueToColumnAsync = (columnId, value) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        const state = getState();
-        const columns = selectColumns(state);
-
-        const changedColumn = columns.find(column => column.id === id);
-        if (!changedColumn) {
-            throw new Error(`Column with id ${id} not found`);
+        const newValue = {
+            columnId,
+            value
         }
-        const newValues = changedColumn.values.filter(value => value !== oldValue);
-
-        const updatedColumn = {
-            ...changedColumn,
-            values: [...newValues, newValue]
-        }
-        console.log('updatedColumn', updatedColumn)
-        await updateColumn(updatedColumn);
-        dispatch(updateValueInColumn(updatedColumn));
+        const columns = await addValues(newValue);
+        dispatch(setColumns(columns));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -110,19 +93,24 @@ export const updateValueToColumnAsync = (id, newValue, oldValue='') => async (di
     }
 };
 
-export const removeValueFromColumnAsync = ( id, valueToRemove ) => async (dispatch) => {
+export const updateValueToColumnAsync = (updateData) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        const columns = await getColumns();
-        const column = columns.find(column => column.id === id);
+        const columns = await updateValues(updateData);
+        dispatch(setColumns(columns));
+        dispatch(setLoading('idle'));
+    } catch (error) {
+        dispatch(setLoading('error'));
+        console.error('Failed to update value to column:', error);
+        dispatch(setError(error.toString()));
+    }
+};
 
-        const updatedColumn = {
-            ...column,
-            values: column.values.filter(value => value !== valueToRemove)
-        }
-        await updateColumn(updatedColumn);
-        dispatch(removeValueFromColumn({ id, valueToRemove }));
-        dispatch(clearRelatedDataAsync(id, valueToRemove));
+export const removeValueFromColumnAsync = ( id ) => async (dispatch) => {
+    dispatch(setLoading('loading'));
+    try {
+        const columns = await deleteValues(id);
+        dispatch(setColumns(columns));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -135,7 +123,6 @@ export const fetchRows = () => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
         const rows = await getRows();
-        console.log("fetchRows", rows)
         dispatch(setRows(rows));
         dispatch(setLoading('idle'));
         console.log("fetchRow", rows)
@@ -145,21 +132,14 @@ export const fetchRows = () => async (dispatch) => {
     }
 };
 
-export const addRowAsync = () => async (dispatch, getState) => {
+export const addRowAsync = () => async (dispatch) => {
     dispatch(setLoading());
     try {
-        const state = getState();
-        const columns = selectColumns(state);
-
-        const newRow = {
-            cellValues: columns.reduce((total, column) => {
-                total[column.id] = '';
-                return total;
-            }, {})
-        };
-
-        const addedRow = await addRow(newRow);
-        dispatch(addRowValue(addedRow));
+        const addedRow = await addRow();
+        console.log("addedRow", addedRow);
+        if (addedRow) {
+            dispatch(createRow(addedRow));
+        }
         dispatch(setLoading('idle'));
     } catch (error) {
         console.error('Failed to add row:', error);
@@ -167,12 +147,10 @@ export const addRowAsync = () => async (dispatch, getState) => {
     }
 };
 
-export const updateRowAsync = (rowData) => async (dispatch) => {
+export const updateRowAsync = (cellData) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        console.log("updateRowAsync-rowData", rowData)
-        const updatedRows = await updateRow(rowData);
-        console.log("row-updateRowAsync", updatedRows)
+        const updatedRows = await updateRow(cellData);
         dispatch(setRows(updatedRows));
         dispatch(setLoading('idle'));
     } catch (error) {
@@ -186,7 +164,6 @@ export const deleteRowAsync = (rowId) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
         const updatedRows = await deleteRow(rowId);
-        console.log('updatedRows', updatedRows);
         dispatch(setRows(updatedRows));
         dispatch(setLoading('idle'));
     } catch (error) {
@@ -196,24 +173,15 @@ export const deleteRowAsync = (rowId) => async (dispatch) => {
     }
 };
 
-const clearRelatedDataAsync = (columnId, oldValue) => async (dispatch, getState) => {
+export const removeValuesFromRowAsync = (cellData) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        const state = getState();
-        const currentRows = selectRows(state);
-
-        const updatedRows = await Promise.all(currentRows.map(async (row) => {
-            if (row[columnId] === oldValue) {
-                const updatedRow = { ...row, [columnId]: '' };
-                return await updateRow(row.id, updatedRow);
-            }
-            return row;
-        }));
-
+        const updatedRows = await deleteCell(cellData);
         dispatch(setRows(updatedRows));
         dispatch(setLoading('idle'));
     } catch (error) {
-        console.error('Failed to clear related data:', error);
+        dispatch(setLoading('error'));
+        console.error('Failed to delete row:', error);
         dispatch(setError(error.toString()));
     }
 };

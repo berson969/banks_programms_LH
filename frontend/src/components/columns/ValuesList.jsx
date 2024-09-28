@@ -1,29 +1,30 @@
 import PropTypes from 'prop-types';
 import {useDispatch} from "react-redux";
-import { removeValueFromColumnAsync } from "../../thunks";
+import {removeValueFromColumnAsync, updateValueToColumnAsync} from "../../thunks";
 
 import ValueInput from "./ValueInput";
 import CrossButton from "../CrossButton";
+// import EditButton from "./EditButton.jsx";
 
-
-function ValuesList({ id, values }) {
+function ValuesList({ Values }) {
     const dispatch = useDispatch();
 
-    const handleRemoveValue = (e, valueToRemove) => {
+    // const handleEditValue = (e, values) => {
+    //     e.preventDefault();
+    //     dispatch(updateValueToColumnAsync(values.id, values.value));
+    // }
+    const handleRemoveValue = (e, id) => {
         e.preventDefault()
-        console.log('removeValue', valueToRemove, id)
-        dispatch(removeValueFromColumnAsync(
-            id,
-            valueToRemove
-        ));
+        dispatch(removeValueFromColumnAsync(id));
     }
-
+    // console.log('Values', Values)
     return (
         <ul>
-            {values && values.map((value, index) => (
-                <li key={index}>
-                    <ValueInput id={id} value={value}  />
-                    <CrossButton onRemoveValue={(e) => handleRemoveValue(e, value)} index={index.toString()} />
+            {Values && Values.map(values => (
+                <li key={values.id}>
+                    <ValueInput  values={values} />
+                    {/*<EditButton onEditValue={(e) => handleEditValue(e, values)} />*/}
+                    <CrossButton onRemoveValue={(e) => handleRemoveValue(e, values.id)} index={values.id} />
                 </li>
             ))}
         </ul>
@@ -31,8 +32,13 @@ function ValuesList({ id, values }) {
 }
 
 ValuesList.propTypes = {
-    id: PropTypes.string.isRequired,
-    values: PropTypes.arrayOf(PropTypes.string)
+    Values: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            columnId: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired
+        })
+    )
 };
 
 export default ValuesList;

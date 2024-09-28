@@ -34,16 +34,16 @@ function ColumnNameInput({ column }) {
 
     return (
         <div className="column-input">
-            <label htmlFor={`columnName-${column.id}`} >Column Name:</label>
+            <label htmlFor={`colName-${column.id}`} >Column Name:</label>
             <input
-                id={`columnName-${column.id}`}
+                id={`colName-${column.id}`}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e)}
                 placeholder="Enter column name"
             />
-            <div>
+            <div className="buttons">
                 <AddButton onClick={(e) => handleSaveNameColumn(e)} text="Save" />
                 <AddButton onClick={(e) => handleRemoveColumn(e)} text="Remove" />
             </div>
@@ -54,8 +54,13 @@ function ColumnNameInput({ column }) {
 ColumnNameInput.propTypes = {
     column: PropTypes.shape({
         id: PropTypes.string.isRequired, // ID колонки
-        name: PropTypes.string.isRequired, // Имя колонки
-        values: PropTypes.arrayOf(PropTypes.string).isRequired, // Значения колонки
+        name: PropTypes.string, // Имя колонки
+        Values: PropTypes.arrayOf(
+            PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+            columnId: PropTypes.string.isRequired
+        })), // Значения колонки
         createdAt: PropTypes.string, // Дата создания
     }).isRequired
 };

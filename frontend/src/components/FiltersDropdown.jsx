@@ -2,24 +2,13 @@ import PropTypes from "prop-types";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectFilters, setFilters} from "../slices";
+import {saveDataToLocalStorage} from "../../localStorageService";
 
 
 function FiltersDropdown({ column }) {
     const dispatch = useDispatch();
     const filters = useSelector(selectFilters);
     const [isPopupOpen, setIsPopupOpen] = useState(true);
-
-    const handleCheckboxChange = (value) => {
-
-            const currentFilters = filters[column.id] || [];
-            const updatedValues = currentFilters.includes(value)
-                ? currentFilters.filter(v => v !== value)
-                : [...currentFilters, value];
-            dispatch(setFilters({
-                ...filters,
-                [column.id]: updatedValues,
-            }));
-    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -37,6 +26,22 @@ function FiltersDropdown({ column }) {
         event.stopPropagation();
     };
 
+    const handleCheckboxChange = (value) => {
+
+        const currentFilters = filters[column.id] || [];
+        const updatedValues = currentFilters.includes(value)
+            ? currentFilters.filter(v => v !== value)
+            : [...currentFilters, value];
+        dispatch(setFilters({
+            ...filters,
+            [column.id]: updatedValues,
+        }));
+        saveDataToLocalStorage('filters', {
+            ...filters,
+            [column.id]: updatedValues,
+        });
+    };
+
     const checkedControl = (value) =>  {
         return Object.keys(filters).includes(column.id)
             ? filters[column.id].includes(value)
@@ -49,26 +54,24 @@ function FiltersDropdown({ column }) {
             {
                 isPopupOpen && (
                 <div className="popup" onClick={handlePopupClick}>
-                    <div>
-                        {column.values.map((value, index) => (
-                            <div key={index}>
-                                <label
-                                    htmlFor={`checkbox-${index}`}
-                                    className="label-filter-input"
-                                >
-                                    <input
-                                        id={`checkbox-${index}`}
-                                        type="checkbox"
-                                        value={value}
-                                        checked={checkedControl(value)}
-                                        onChange={() => handleCheckboxChange(value)}
-                                    />
-                                    {value}
-                                </label>
-                            </div>
-                        ))}
-                        {/*<button onClick={handleApplyFilter}>Apply Filter</button>*/}
-                    </div>
+                    {column.Values.map(values => (
+                        <div key={values.id} className="filter-list">
+                            <label
+                                htmlFor={values.id}
+                                className="label-filter"
+                            >
+                                <input
+                                    id={values.id}
+                                    type="checkbox"
+                                    value={values.value}
+                                    checked={checkedControl(values.value)}
+                                    onChange={() => handleCheckboxChange(values.value)}
+                                    className="filter-checkbox"
+                                />
+                                {values.value}
+                            </label>
+                        </div>
+                    ))}
                 </div>
             )
             }
@@ -80,7 +83,13 @@ FiltersDropdown.propTypes = {
     column: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        values: PropTypes.arrayOf(PropTypes.string).isRequired,
+        Values: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string,
+                columnId: PropTypes.string,
+                value: PropTypes.string
+            })
+        ).isRequired,
     }).isRequired,
 };
 

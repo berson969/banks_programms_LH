@@ -32,46 +32,17 @@ export const tableSlice = createSlice({
             state.columns = sortedColumns(action.payload);
             state.status = 'succeeded';
         },
-        addColumnName: (state, action) => {
+        changeColumn: (state, action) => {
             const newColumns = [...state.columns, action.payload];
             state.columns = sortedColumns(newColumns)
-            console.log("addColumnName", state.columns )
-        },
-        removeColumn: (state, action) => {
-            const newColumns = state.columns.filter(column => column.id !== action.payload);
-            state.columns = sortedColumns(newColumns);
-            console.log("removeColumn", state.columns )
-        },
-        updateColumnName: (state, action) => {
-            const index = state.columns.findIndex(column => column.id === action.payload.id);
-            if (index !== -1) {
-                state.columns[index] = {
-                    ...state.columns[index],
-                    name: action.payload.name
-                };
-            }
-            state.columns = sortedColumns(state.columns);
-        },
-        updateValueInColumn: (state, action) => {
-            const newColumns = state.columns.map(col => col.id === action.payload.id ? action.payload : col);
-            state.columns = sortedColumns(newColumns);
-            console.log("updateColumnName", state.columns )
-        },
-        removeValueFromColumn: (state, action) => {
-            const {id, valueToRemove} = action.payload;
-            const column = state.columns.find(column => column.id === id);
-            if (column) {
-                column.values = column.values.filter(value => value !== valueToRemove);
-            }
-            state.columns = sortedColumns(state.columns);
         },
 
         setRows: (state, action) => {
-            console.log("RowS", action.payload);
             state.rows = sortedRows(action.payload);
             state.status = 'succeeded';
         },
-        addRowValue: (state, action) => {
+
+        createRow: (state, action) => {
             const newRows = [...state.rows, action.payload];
             state.rows = sortedRows(newRows);
             state.status = 'succeeded';
@@ -102,13 +73,9 @@ export const tableSlice = createSlice({
 
 export const {
     setColumns,
-    addColumnName,
-    removeColumn,
-    updateColumnName,
-    removeValueFromColumn,
-    updateValueInColumn,
+    changeColumn,
     setRows,
-    addRowValue,
+    createRow,
     setLoading,
     setError,
     setFilters,

@@ -1,26 +1,16 @@
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import RowCell from './RowCell.jsx';
-import {deleteRowAsync, updateRowAsync} from '../../thunks/index.js';
-import {selectColumns, selectUser} from "../../slices/index.js";
-import CrossButton from "../CrossButton.jsx";
+
+import {deleteRowAsync} from '../../thunks';
+import {selectColumns, selectUser} from "../../slices";
+import CrossButton from "../CrossButton";
+import RowCell from './RowCell';
 
 
 function Row ({ row }) {
     const dispatch = useDispatch();
     const columns = useSelector(selectColumns);
     const { role } = useSelector(selectUser);
-
-    function getCellValueByColumnId(row, columnId) {
-        const cellValueObject = row.cellValues.find(cell => cell.columnId === columnId);
-        return cellValueObject ? cellValueObject.cellValue : '';
-    }
-
-    const handleChange = (columnId, value) => {
-        console.log('handleChange-Row', columnId, value, row)
-        const updateData = { rowId: row.id, columnId, value };
-        dispatch(updateRowAsync(updateData));
-    };
 
     const handleDeleteRow = () => {
         dispatch(deleteRowAsync(row.id));
@@ -32,8 +22,7 @@ function Row ({ row }) {
                 <RowCell
                     key={column.id}
                     column={column}
-                    value={getCellValueByColumnId(row, column.id)}
-                    onChange={handleChange}
+                    row={row}
                 />
             ))}
             {role === 'admin' &&
@@ -54,7 +43,7 @@ Row.propTypes = {
         cellValues: PropTypes.arrayOf(PropTypes.shape({
             rowId: PropTypes.string.isRequired,
             columnId: PropTypes.string.isRequired,
-            cellValue: PropTypes.string.isRequired
+            valueId: PropTypes.string
         })).isRequired,
     }).isRequired
 };
