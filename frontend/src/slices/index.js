@@ -32,9 +32,17 @@ export const tableSlice = createSlice({
             state.columns = sortedColumns(action.payload);
             state.status = 'succeeded';
         },
-        changeColumn: (state, action) => {
+        createColumn: (state, action) => {
             const newColumns = [...state.columns, action.payload];
-            state.columns = sortedColumns(newColumns)
+            state.columns = sortedColumns(newColumns);
+            state.status = 'succeeded';
+        },
+
+        changeColumn: (state, action) => {
+            const changeColumns = state.columns
+                .map(column => (column.id === action.payload.id) ? action.payload: column);
+            state.columns = sortedColumns(changeColumns);
+            state.status = 'succeeded';
         },
 
         setRows: (state, action) => {
@@ -73,6 +81,7 @@ export const tableSlice = createSlice({
 
 export const {
     setColumns,
+    createColumn,
     changeColumn,
     setRows,
     createRow,

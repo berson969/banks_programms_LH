@@ -9,13 +9,9 @@ export const getColumns = async () => {
     return response.data;
 };
 
-export const addColumn = async (column) => {
+export const addColumn = async () => {
     // name
-    const response = await axios.post(`${API_URL}/columns`, column, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+    const response = await axios.post(`${API_URL}/columns`);
     return response.data;
 };
 

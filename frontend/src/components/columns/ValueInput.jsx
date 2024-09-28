@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {updateValueToColumnAsync} from "../../thunks";
 import PropTypes from "prop-types";
@@ -7,6 +7,7 @@ import EditButton from "./EditButton";
 
 function ValueInput({ values }) {
     const dispatch = useDispatch();
+    const inputRef = useRef(null);
     const [valueInput, setValueInput] = useState(values.value);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -23,15 +24,22 @@ function ValueInput({ values }) {
                 value: valueInput
             }
             dispatch(updateValueToColumnAsync(valueData));
-        };
+        }
         setIsEditing(!isEditing);
+        console.log("inputRef-ValInput", inputRef.current);
+        if (inputRef.current && !isEditing) {
+            inputRef.current.focus();
+        }
     };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             handleEditValue(e);
-            setIsEditing(false);
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+            // setIsEditing(false);
         }
     }
     // console.log("values", values, values.id)
@@ -45,6 +53,9 @@ function ValueInput({ values }) {
                 placeholder="Enter value"
                 disabled={!isEditing}
                 onKeyDown={handleKeyDown}
+                autoFocus={isEditing}
+                ref={inputRef}
+
             />
             <EditButton onEditValue={handleEditValue} />
         </div>

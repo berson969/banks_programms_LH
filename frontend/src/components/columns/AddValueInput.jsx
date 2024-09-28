@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useRef, useState} from 'react';
 import {useDispatch} from "react-redux";
 import {addValueToColumnAsync} from "../../thunks";
 import PropTypes from "prop-types";
@@ -6,18 +6,23 @@ import PropTypes from "prop-types";
 
 function AddValueInput ({ column }) {
     const dispatch = useDispatch();
+    const inputRef = useRef(null);
     const [newValue, setNewValue] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (newValue) {
-            const unique = column.Values.find(values => values.value === newValue);
+        if (newValue.trim()) {
+            const unique = column.Values.find(values => values.value === newValue.trim());
             if (!unique) {
                 dispatch(addValueToColumnAsync(
                     column.id,
-                    newValue
+                    newValue.trim()
                 ))
                 setNewValue('');
+                console.log("inputRef-AddvalueInput", inputRef.current);
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                }
             } else {
                 console.log("unique-cancel", unique)
             }
@@ -30,8 +35,9 @@ function AddValueInput ({ column }) {
                 id={`value-${column.id}`}
                 type="text"
                 value={newValue}
-                onChange={(e) => setNewValue(e.target.value.trim())}
+                onChange={(e) => setNewValue(e.target.value)}
                 placeholder="Enter new value"
+                ref={inputRef}
             />
             <button type="submit">Add Value</button>
         </form>

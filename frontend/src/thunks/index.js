@@ -14,6 +14,7 @@ import {
 } from '../api';
 import {
     setColumns,
+    createColumn,
     changeColumn,
     setLoading,
     setError,
@@ -38,11 +39,8 @@ export const fetchColumns = () => async (dispatch) => {
 export const addColumnAsync = () => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        const column = {
-            name: ''
-        };
-        const newColumn = await addColumn(column);
-        dispatch(changeColumn(newColumn));
+        const newColumn = await addColumn();
+        dispatch(createColumn(newColumn));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));
@@ -54,8 +52,8 @@ export const addColumnAsync = () => async (dispatch) => {
 export const updateColumnAsync = (column) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        await updateColumn(column)
-        dispatch(changeColumn(column));
+        const updatedColumn = await updateColumn(column);
+        dispatch(changeColumn(updatedColumn));
         dispatch(setLoading('idle'));
     } catch (error) {
         dispatch(setLoading('error'));

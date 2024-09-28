@@ -38,6 +38,7 @@ const Column = sequelize.define('Column', {
     },
     name: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false
     },
     createdAt: {
@@ -167,7 +168,7 @@ app.get('/api/columns', async (req, res) => {
 
 app.post('/api/columns', async (req, res) => {
     try {
-        const column = await Column.create(req.body);
+        const column = await Column.create();
         const newColumn = await Column.findByPk(column.id,
             {
                 include: [{

@@ -16,7 +16,6 @@ function ColumnNameInput({ column }) {
                 ...column,
                 name
             }
-
             dispatch(updateColumnAsync(updateColumn));
         }
     };
@@ -39,7 +38,7 @@ function ColumnNameInput({ column }) {
                 id={`colName-${column.id}`}
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value.trim())}
                 onKeyDown={(e) => handleKeyDown(e)}
                 placeholder="Enter column name"
             />
