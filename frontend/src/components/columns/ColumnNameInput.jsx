@@ -26,6 +26,7 @@ function ColumnNameInput({ column }) {
     };
 
     const handleKeyDown = (e) => {
+        e.preventDefault();
         if (e.key === 'Enter') {
             handleSaveNameColumn(e);
         }

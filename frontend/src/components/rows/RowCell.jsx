@@ -23,6 +23,21 @@ function RowCell ({ column, row }) {
         setSelectedOptions(selectedValues);
     }, [row.cellValues, column]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            const optionsList = document.querySelector('.options-list');
+            if (isOpen && optionsList && !optionsList.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
+
+
     const handleChange = (e, option) => {
         e.preventDefault();
         e.stopPropagation();

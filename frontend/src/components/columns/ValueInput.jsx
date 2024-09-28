@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {updateValueToColumnAsync} from "../../thunks";
@@ -5,7 +6,7 @@ import PropTypes from "prop-types";
 import EditButton from "./EditButton";
 
 
-function ValueInput({ values }) {
+const ValueInput = React.memo( ({ values }) => {
     const dispatch = useDispatch();
     const inputRef = useRef(null);
     const [valueInput, setValueInput] = useState(values.value);
@@ -60,7 +61,7 @@ function ValueInput({ values }) {
             <EditButton onEditValue={handleEditValue} />
         </div>
     );
-}
+});
 
 ValueInput.propTypes = {
     values: PropTypes.shape({
@@ -70,4 +71,5 @@ ValueInput.propTypes = {
         }).isRequired
 };
 
+ValueInput.displayName = "ValueInput";
 export default ValueInput;

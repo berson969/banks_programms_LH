@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from 'prop-types';
 import {useDispatch} from "react-redux";
 import {removeValueFromColumnAsync} from "../../thunks";
@@ -6,13 +7,13 @@ import ValueInput from "./ValueInput";
 import CrossButton from "../CrossButton";
 
 
-function ValuesList({ Values }) {
+const  ValuesList = React.memo( ({ Values }) => {
     const dispatch = useDispatch();
 
     const handleRemoveValue = (e, id) => {
         e.preventDefault()
         dispatch(removeValueFromColumnAsync(id));
-    }
+    };
     // console.log('Values', Values)
     return (
         <ul>
@@ -24,7 +25,7 @@ function ValuesList({ Values }) {
             ))}
         </ul>
     );
-}
+});
 
 ValuesList.propTypes = {
     Values: PropTypes.arrayOf(
@@ -36,4 +37,5 @@ ValuesList.propTypes = {
     )
 };
 
+ValuesList.displayName = "ValuesList";
 export default ValuesList;
