@@ -1,0 +1,5 @@
+# Запуск проверки работоспособности базы данных каждые 5 минут
+*/5 * * * * /usr/local/bin/check_db.sh >> /var/log/check_db.log 2>&1
+
+# Резервное копирование базы данных каждый день в 2:00
+0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
