@@ -271,12 +271,14 @@ app.delete('/api/columns/:id', async (req, res) => {
     try {
         const values = await Values.findAll({ where: { columnId: req.params.id } });
         const valueIds = values.map(value => value.id);
-        await Values.destroy({
-            where: { valueId: valueIds }
-        });
-        await Values.destroy({
-            where: { columnId: req.params.id }
-        });
+
+        if (valueIds.length > 0) {
+            await Values.destroy({
+                where: {id: {
+                    [Op.in]: valueIds
+                    }}
+            });
+        }
 
         const deleted = await Column.destroy({
             where: { id: req.params.id }

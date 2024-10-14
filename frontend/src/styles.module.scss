@@ -38,6 +38,9 @@ a:hover {
 
 .container {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   max-width: none;
   padding-right: 15px;
   padding-left: 15px;
