@@ -1,19 +1,22 @@
-FROM alpine:latest
+FROM postgres:latest
 
-RUN apk add --no-cache bash curl postgresql-client
+# Установка необходимых пакетов для cron и bash
+RUN apt-get update && apt-get install -y cron bash
 
-# Создание директории для резервных копий
-RUN mkdir -p /backups
-
+# Копирование скриптов в контейнер
+COPY check_db.sh /usr/local/bin/check_db.sh
 COPY backup.sh /usr/local/bin/backup.sh
 COPY restore.sh /usr/local/bin/restore.sh
-COPY .pgpass /root/
-RUN chmod +x /usr/local/bin/backup.sh /usr/local/bin/restore.sh
-RUN chmod 600  /root/.pgpass
+COPY .pgpass /root/.pgpass
+COPY cronjob /etc/cron.d/cronjob
 
+# Установка прав на выполнение скриптов
+RUN chmod +x /usr/local/bin/check_db.sh && \
+    chmod +x /usr/local/bin/backup.sh && \
+    chmod +x /usr/local/bin/restore.sh && \
+    chmod 0644 /etc/cron.d/cronjob && \
+    chmod 600 /root/.pgpass && \
+    crontab /etc/cron.d/cronjob
 
-# Установка cron и добавление задания для резервного копирования каждые 6 часов
-RUN apk add --no-cache openrc && \
-    echo "0 */6 * * * /usr/local/bin/backup.sh" >> /etc/crontabs/root
-
-CMD ["/bin/sh", "-c", "/usr/local/bin/backup.sh && crond -f"]
+# Запуск cron в фоновом режиме и PostgreSQL
+CMD ["bash", "-c", "cron && docker-entrypoint.sh postgres"]

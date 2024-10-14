@@ -1,7 +1,8 @@
 
 import { useEffect } from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import './App.css';
+import styles from './styles.module.scss';
+// import './App.cssввв';
 
 import {fetchColumns, fetchRows} from './thunks';
 import {login, logout, selectColumns, selectError, selectStatus, selectUser, setLoading} from "./slices";
@@ -9,7 +10,7 @@ import {login, logout, selectColumns, selectError, selectStatus, selectUser, set
 import Table from "./components/Table";
 import Columns from "./components/columns/Columns";
 import TableControls from "./components/TableControls";
-import LoginForm from "./components/LoginForm";
+import LoginForm from "./components/LoginForm/index.jsx";
 import ClearFilters from "./components/ClearFilters";
 
 
@@ -51,15 +52,15 @@ function App() {
   }, [dispatch]);
 
   if (status === 'loading') return <div>Loading...</div>;
-  if (status === 'failed') return <div>Error: {error}</div>;
+  // if (status === 'failed') return <div>Error: {error}</div>;
 
   // console.log("column-app", columns)
   return (
-      <div className="container">
+      <div className={styles.container}>
         <h1>Banks Programs</h1>
         {!isAuthenticated && <LoginForm />}
         {isAuthenticated && role === "admin" &&
-            <div className="column-views">
+            <div className={styles.column_views}>
               {columns && columns.map((column) => (
                   <Columns
                       key={column.id}

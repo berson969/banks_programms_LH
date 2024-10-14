@@ -17,7 +17,7 @@ fi
 
 echo "Удаление существующей базы данных '$DB_NAME'..."
 # Удаление базы данных
-psql -U "$DB_USER" -h "$DB_HOST" -d postgres -c "DROP DATABASE IF EXISTS \"$DB_NAME\";"
+psql -U  "$DB_USER" -h "$DB_HOST" -d postgres -W -c "DROP DATABASE IF EXISTS \"$DB_NAME\";"
 
 echo "Создание новой базы данных '$DB_NAME'..."
 # Создание новой базы данных

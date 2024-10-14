@@ -1,0 +1,97 @@
+$popup-background: rgba(0, 0, 0, 0.8);
+$popup-color: #fff;
+$popup-border: #999999;
+$popup-text: #2F4F4F;
+
+.popup {
+  position: absolute;
+  top: 36px;
+  left: 20px;
+  margin: 0 auto;
+  background-color: $popup-color;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  z-index: 100;
+  width: 100%;
+  padding: 15px;
+
+  .title {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  .popup_content {
+    position: relative;
+    background-color: $popup-color;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 20px;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      input {
+        border: 1px solid $popup-border;
+        text-decoration: none;
+        color: $popup-text;
+        cursor: text;
+      }
+
+      .error {
+        font-size: 12px;
+        color: red;
+      }
+    }
+
+    .addition_item {
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+
+      .content {
+          border: none;
+          background: transparent;
+
+          span {
+          }
+
+          a {
+            border: none;
+            color: blue;
+            text-decoration: underline;
+
+            &:hover,
+            &:focus {
+              font-style: italic;
+              outline: none;
+            }
+          }
+        }
+      }
+  }
+}
+
+.close {
+  position: absolute;
+  top:5px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.input_addition {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+
+  span {
+    font-size: 12px;
+  }
+  select {
+    border: none;
+  }
+}

@@ -1,0 +1,71 @@
+@import '../styles.module';
+
+.input_values {
+  width: 100%;
+  position: relative;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  top: 3px;
+  right: 2px;
+}
+
+.edit_button, .cross_button {
+  height: 24px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 5px 0;
+  text-align: center;
+  transition: background-color 0.3s;
+  opacity: 0.1;
+}
+
+.edit_button {
+  color: #45a049;
+  margin-top: 3px;
+}
+
+.edit_button:hover, .edit_button:visited {
+  background-color: transparent;
+  color: red;
+  opacity: 1;
+}
+
+.user_cell__content {
+  text-decoration: underline;
+  color: blue;
+
+  &:hover {
+    font-style: italic;
+  }
+}
+
+.input_values.cell_border {
+
+  form {
+
+    input {
+      border: none;
+      text-decoration: underline;
+      color: blue;
+      cursor: pointer;
+      padding-left: 20px;
+    }
+
+    &:hover {
+      font-style: italic;
+    }
+
+    .buttons {
+      left: 2px
+    }
+
+  }
+}

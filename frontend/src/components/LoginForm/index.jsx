@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {login, logout, setError, setLoading} from '../slices';
-import {checkPassword} from "../api";
+import {login, logout, setError, setLoading} from '../../slices';
+import {checkPassword} from "../../api";
 import {
     getDataFromLocalStorage,
     removeDataFromLocalStorage,
     saveDataToLocalStorage
-} from "../../localStorageService";
+} from "../../../hooks/localStorageService";
 
 function LoginForm () {
     const dispatch = useDispatch();
@@ -63,6 +63,7 @@ function LoginForm () {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
+                    autoComplete="current-password"
                     required
                 />
                 <button type="submit">Login</button>

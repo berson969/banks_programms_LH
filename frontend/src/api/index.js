@@ -79,4 +79,19 @@ export const deleteCell = async (cellData) => {
 export const checkPassword = async (password) => {
     const response = await axios.post(`${API_URL}/password`, password);
     return response.data;
-}
+};
+
+export const addAddition = async (addition) => {
+    const response = await axios.post(`${API_URL}/addition`, addition);
+    return response.data;
+};
+
+export const deleteAddition = async (id) => {
+    const response = await axios.delete(`${API_URL}/addition/${id}`);
+    return response.data;
+};
+
+export const updateAddition = async (addition) => {
+    const response = await axios.put(`${API_URL}/addition/${addition.id}`, addition);
+    return response.data;
+};

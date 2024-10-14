@@ -1,0 +1,24 @@
+.edit_button {
+  height: 24px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 5px 0;
+  text-align: center;
+  transition: background-color 0.3s;
+  opacity: 0.1;
+}
+
+.edit_button {
+  color: #45a049;
+  margin-top: 3px;
+}
+
+.edit_button:hover, .edit_button:visited {
+  background-color: transparent;
+  color: red;
+  opacity: 1;
+}

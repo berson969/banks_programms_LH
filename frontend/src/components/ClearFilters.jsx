@@ -1,6 +1,8 @@
-import {removeDataFromLocalStorage} from "../../localStorageService.js";
+import styles from './styles.module.scss';
 import {useDispatch} from "react-redux";
-import {setFilters} from "../slices/index.js";
+
+import {removeDataFromLocalStorage} from "../../hooks/localStorageService.js";
+import {setFilters} from "../slices";
 
 function ClearFilters() {
     const dispatch = useDispatch();
@@ -13,7 +15,7 @@ function ClearFilters() {
 
     return (
         <a
-            className="clear-filters"
+            className={styles.clear_filters}
             onClick={handleClearFilters}
         >
             Clear all filters

@@ -1,0 +1,22 @@
+.column_view {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  align-items: center;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.column_input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  flex-wrap: nowrap;
+}

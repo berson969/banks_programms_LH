@@ -10,7 +10,10 @@ import {
     addRow,
     updateRow,
     deleteRow,
-    deleteCell
+    deleteCell,
+    addAddition,
+    updateAddition,
+    deleteAddition
 } from '../api';
 import {
     setColumns,
@@ -180,6 +183,48 @@ export const removeValuesFromRowAsync = (cellData) => async (dispatch) => {
     } catch (error) {
         dispatch(setLoading('error'));
         console.error('Failed to delete row:', error);
+        dispatch(setError(error.toString()));
+    }
+};
+
+export const addAdditionAsync = (addition) => async (dispatch) => {
+    dispatch(setLoading('loading'));
+    try {
+        const columns = await addAddition(addition);  // console.log("adding addition", columns);
+        dispatch(setColumns(columns));
+
+        dispatch(setLoading('idle'));
+    } catch  (error) {
+        dispatch(setLoading('error'));
+        console.error('Failed to add addition:', error);
+        dispatch(setError(error.toString()));
+    }
+};
+
+export const updateAdditionAsync = (addition) => async (dispatch) => {
+    dispatch(setLoading('loading'));
+    try {
+        const columns = await updateAddition(addition);
+        dispatch(setColumns(columns));
+
+        dispatch(setLoading('idle'));
+    } catch  (error) {
+        dispatch(setLoading('error'));
+        console.error('Failed to update addition:', error);
+        dispatch(setError(error.toString()));
+    }
+};
+
+export const deleteAdditionAsync = (id) => async (dispatch) => {
+    dispatch(setLoading('loading'));
+    try {
+        const columns = await deleteAddition(id);
+        dispatch(setColumns(columns));
+
+        dispatch(setLoading('idle'));
+    } catch  (error) {
+        dispatch(setLoading('error'));
+        console.error('Failed to delete addition:', error);
         dispatch(setError(error.toString()));
     }
 };

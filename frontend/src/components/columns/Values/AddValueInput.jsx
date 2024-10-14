@@ -1,16 +1,15 @@
-import {useRef, useState} from 'react';
-import {useDispatch} from "react-redux";
-import {addValueToColumnAsync} from "../../thunks";
 import PropTypes from "prop-types";
+import {useState} from 'react';
+import {useDispatch} from "react-redux";
+import {addValueToColumnAsync} from "../../../thunks";
+import Input from "../../features/Input";
 
 
 function AddValueInput ({ column }) {
     const dispatch = useDispatch();
-    const inputRef = useRef(null);
     const [newValue, setNewValue] = useState('');
 
     const handleSubmit = (e) => {
-        e.preventDefault();
         if (newValue.trim()) {
             const unique = column.Values.find(values => values.value === newValue.trim());
             if (!unique) {
@@ -19,27 +18,33 @@ function AddValueInput ({ column }) {
                     newValue.trim()
                 ))
                 setNewValue('');
-                console.log("inputRef-AddvalueInput", inputRef.current);
-                if (inputRef.current) {
-                    inputRef.current.focus();
-                }
             } else {
                 console.log("unique-cancel", unique)
             }
         }
     };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit(e);
+        }
+    }
+
     // console.log("AddValueInput ",  id)
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                id={`value-${column.id}`}
-                type="text"
+        <form
+            id={`form-${column.id}`}
+            onSubmit={handleSubmit}
+            >
+            <Input
+                id={`new-value-${column.id}`}
                 value={newValue}
+                description="value"
                 onChange={(e) => setNewValue(e.target.value)}
-                placeholder="Enter new value"
-                ref={inputRef}
-            />
-            <button type="submit">Add Value</button>
+                onKeyDown={handleKeyDown}
+                isEditing={true}
+                />
         </form>
     );
 }

@@ -1,29 +1,31 @@
-import PropTypes from "prop-types";
-import {useEffect, useState} from "react";
+import PropTypes, {string} from "prop-types";
+import styles from './styles.module.scss';
+import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilters, setFilters} from "../slices";
-import {saveDataToLocalStorage} from "../../localStorageService";
+import {selectFilters, selectOpenPopup, setFilters, setOpenPopup, toggleOpenPopup} from "../slices";
+import {saveDataToLocalStorage} from "../../hooks/localStorageService.js";
 
 
 function FiltersDropdown({ column }) {
     const dispatch = useDispatch();
     const filters = useSelector(selectFilters);
-    const [isPopupOpen, setIsPopupOpen] = useState(true);
+    const openPopup = useSelector(selectOpenPopup);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isPopupOpen && !event.target.closest('.popup')) {
-                setIsPopupOpen(false);
+            if (openPopup && !event.target.closest('.popup')) {
+                setOpenPopup({ ['filter']: false });
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isPopupOpen]);
+    }, [openPopup]);
 
-    const handlePopupClick = (event) => {
-        event.stopPropagation();
+    const handlePopupClick = (e) => {
+        e.stopPropagation();
+        setOpenPopup({ ['filter']: false });
     };
 
     const handleCheckboxChange = (value) => {
@@ -32,6 +34,7 @@ function FiltersDropdown({ column }) {
         const updatedValues = currentFilters.includes(value)
             ? currentFilters.filter(v => v !== value)
             : [...currentFilters, value];
+        console.log("updatedValues-filters", updatedValues);
         dispatch(setFilters({
             ...filters,
             [column.id]: updatedValues,
@@ -50,15 +53,15 @@ function FiltersDropdown({ column }) {
 
 
     return (
-        <div className="table-header">
+        <div className={styles.table_header}>
             {
-                isPopupOpen && (
-                <div className="popup" onClick={handlePopupClick}>
+                openPopup['filter'] && (
+                <div className={styles.popup} onClick={handlePopupClick}>
                     {column.Values.map(values => (
-                        <div key={values.id} className="filter-list">
+                        <div key={values.id} className={styles.filter_list}>
                             <label
                                 htmlFor={values.id}
-                                className="label-filter"
+                                className={styles.label_filter}
                             >
                                 <input
                                     id={values.id}
@@ -66,7 +69,7 @@ function FiltersDropdown({ column }) {
                                     value={values.value}
                                     checked={checkedControl(values.value)}
                                     onChange={() => handleCheckboxChange(values.value)}
-                                    className="filter-checkbox"
+                                    className={styles.filter_checkbox}
                                 />
                                 {values.value}
                             </label>

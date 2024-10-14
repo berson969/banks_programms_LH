@@ -1,0 +1,22 @@
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+ul li {
+  border: 1px solid #cccccc;
+  position: relative;
+}
+
+li form {
+  width: 100%;
+}
+
+.value_input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  position: relative;
+}

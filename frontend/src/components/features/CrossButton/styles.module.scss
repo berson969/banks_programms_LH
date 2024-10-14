@@ -1,0 +1,20 @@
+.cross_button {
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 5px 0;
+  text-align: center;
+  transition: background-color 0.3s;
+  opacity: 0.1;
+  color: red;
+  height: 20px;
+  font-size: 20px;
+}
+
+.cross_button:hover {
+  background-color: transparent;
+  color: #45a049;
+  opacity: 1;
+}

@@ -1,15 +1,17 @@
 import  {useState} from 'react';
 import PropTypes from "prop-types";
+import styles from "./styles.module.scss";
 import {useDispatch} from "react-redux";
 import { updateColumnAsync, deleteColumnAsync } from "../../thunks";
 import AddButton from "../AddButton";
+import Input from "../features/Input/index.jsx";
 
 
 function ColumnNameInput({ column }) {
     const dispatch = useDispatch();
     const [name, setName] = useState(column.name);
 
-    const handleSaveNameColumn = (e) => {
+    const handleUpdateNameColumn = (e) => {
         e.preventDefault();
         if (name !== column.name) {
             const updateColumn = {
@@ -26,25 +28,24 @@ function ColumnNameInput({ column }) {
     };
 
     const handleKeyDown = (e) => {
-        e.preventDefault();
         if (e.key === 'Enter') {
-            handleSaveNameColumn(e);
+            handleUpdateNameColumn(e);
         }
     };
 
     return (
-        <div className="column-input">
-            <label htmlFor={`colName-${column.id}`} >Column Name:</label>
-            <input
-                id={`colName-${column.id}`}
-                type="text"
+        <div className={styles.column_input}>
+            <div>Column Name:</div>
+            <Input
+                id={`col-name-${column.id}`}
                 value={name}
-                onChange={(e) => setName(e.target.value.trim())}
-                onKeyDown={(e) => handleKeyDown(e)}
-                placeholder="Enter column name"
+                description="name"
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                isEditing={true}
             />
-            <div className="buttons">
-                <AddButton onClick={(e) => handleSaveNameColumn(e)} text="Save" />
+            <div className={styles.buttons}>
+                <AddButton onClick={(e) => handleUpdateNameColumn(e)} text="Save" />
                 <AddButton onClick={(e) => handleRemoveColumn(e)} text="Remove" />
             </div>
         </div>

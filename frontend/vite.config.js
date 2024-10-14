@@ -6,5 +6,12 @@ export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     exclude: ['fsevents']
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+      }
+    }
   }
 })

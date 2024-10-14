@@ -1,13 +1,14 @@
 /* global process */
 import express from 'express';
 import {DataTypes, Op, Sequelize} from 'sequelize';
+import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
 
 
 const app = express();
 app.use(cors({
-    origin: [ 'http://localhost:5173', 'http://91.109.202.105', ],
+    origin: [ 'http://localhost:5173', 'http://91.109.202.105', 'http://localhost'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'XSRF-TOKEN']
 }));
@@ -47,6 +48,45 @@ const Column = sequelize.define('Column', {
     }
 });
 
+const Addition = sequelize.define('Addition', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
+    valuesId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+    additionValue: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    typeValue: {
+        type: DataTypes.ENUM('email', 'url', 'text'),
+        allowNull: false
+    }
+}, {
+    hooks: {
+        beforeValidate: (addition) => {
+            const value = addition.additionValue;
+            const type = addition.typeValue;
+
+            if (type === 'email') {
+                // Встроенная проверка на email
+                if (!validator.isEmail(value)) {
+                    throw new Error('Invalid email format');
+                }
+            } else if (type === 'link') {
+                // Встроенная проверка на URL
+                if (!validator.isURL(value)) {
+                    throw new Error('Invalid URL format');
+                }
+            }
+        }
+    }
+});
+
 const Values = sequelize.define('Values', {
     id: {
         type: DataTypes.UUID,
@@ -65,7 +105,7 @@ const Values = sequelize.define('Values', {
         type: DataTypes.STRING,
         defaultValue: ''
     }
-})
+});
 
 // Определение модели для строк
 const Row = sequelize.define('Row', {
@@ -113,15 +153,19 @@ const Cells = sequelize.define('Cells', {
 })
 
 // Устанавливаем связи
-Column.hasMany(Cells, { foreignKey: 'columnId' });
-Column.hasMany(Values, { foreignKey: 'columnId' });
-Row.hasMany(Cells, { foreignKey: 'rowId', as: 'cellValues' });
-Values.hasMany(Cells, { foreignKey: 'valuesId' });
+Column.hasMany(Cells, { foreignKey:'columnId' });
+Column.hasMany(Values, { foreignKey:'columnId' });
 
-Values.belongsTo(Column, { foreignKey: 'columnId' });
-Cells.belongsTo(Column, { foreignKey: 'columnId' });
-Cells.belongsTo(Row, { foreignKey: 'rowId' });
-Cells.belongsTo(Values, { foreignKey: 'valuesId' });
+Row.hasMany(Cells, { foreignKey:'rowId', as:'cellValues' });
+Values.hasMany(Cells, { foreignKey:'valuesId' });
+
+Values.belongsTo(Column, { foreignKey:'columnId' });
+Cells.belongsTo(Column, { foreignKey:'columnId' });
+Cells.belongsTo(Row, { foreignKey:'rowId' });
+Cells.belongsTo(Values, { foreignKey:'valuesId' });
+
+Values.hasMany(Addition, { foreignKey:'valuesId', as: "addition", onDelete: 'CASCADE' });
+Addition.belongsTo(Values, { foreignKey:'valuesId', as: 'addition', onDelete: 'CASCADE' });
 
 // Синхронизация моделей с базой данных
 sequelize.sync().then(() => {
@@ -129,6 +173,7 @@ sequelize.sync().then(() => {
 }).catch(err => {
     console.error('Error syncing database:', err);
 });
+
 
 // API endpoints
 app.post('/api/password', async (req, res) => {
@@ -153,10 +198,14 @@ app.post('/api/password', async (req, res) => {
 app.get('/api/columns', async (req, res) => {
     try {
         const columns = await Column.findAll({
-            order: [['createdAt', 'DESC']],
             include: [{
                 model: Values,
-                required: false
+                required: false,
+                include: [{
+                    model: Addition,
+                    as: 'addition',
+                    required: false
+                }]
             }]
         });
         res.json(columns);
@@ -173,7 +222,12 @@ app.post('/api/columns', async (req, res) => {
             {
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
             }
         );
@@ -195,7 +249,12 @@ app.put('/api/columns/:id', async (req, res) => {
                 {
                     include: [{
                         model: Values,
-                        required: false
+                        required: false,
+                        include: [{
+                            model: Addition,
+                            as: 'addition',
+                            required: false
+                        }]
                     }]
                 });
             res.json(updatedColumn);
@@ -210,6 +269,15 @@ app.put('/api/columns/:id', async (req, res) => {
 
 app.delete('/api/columns/:id', async (req, res) => {
     try {
+        const values = await Values.findAll({ where: { columnId: req.params.id } });
+        const valueIds = values.map(value => value.id);
+        await Values.destroy({
+            where: { valueId: valueIds }
+        });
+        await Values.destroy({
+            where: { columnId: req.params.id }
+        });
+
         const deleted = await Column.destroy({
             where: { id: req.params.id }
         });
@@ -218,10 +286,14 @@ app.delete('/api/columns/:id', async (req, res) => {
                 { where: { columnId: req.params.id } }
             );
             const updatedColumns = await Column.findAll({
-                order: [['createdAt', 'DESC']],
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
             });
             res.json(updatedColumns);
@@ -244,10 +316,14 @@ app.post('/api/values/', async (req, res) => {
                value: req.body.value,
             });
             const updatedColumns = await Column.findAll({
-                order: [['createdAt', 'DESC']],
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
             });
             res.json(updatedColumns);
@@ -263,20 +339,35 @@ app.post('/api/values/', async (req, res) => {
 app.put('/api/values/:id', async (req, res) => {
     try {
         const updateValue = await Values.findByPk(req.params.id);
-        if (updateValue) {
-            updateValue.value = req.body.value;
-            await updateValue.save();
-            const updatedColumns = await Column.findAll({
-                order: [['createdAt', 'DESC']],
+
+        if (!updateValue) {
+            return res.status(404).json({ message: 'Value not found' });
+        }
+
+        const cellsToUpdate = await Cells.findAll({
+            where: { valuesId: updateValue.id }
+        });
+
+        if (cellsToUpdate.length > 0) {
+            await Cells.update(
+                { value: req.body.value },
+                { where: { valuesId: updateValue.id }
+            })
+        };
+        updateValue.value = req.body.value;
+        await updateValue.save();
+        const updatedColumns = await Column.findAll({
+            include: [{
+                model: Values,
+                required: false,
                 include: [{
-                    model: Values,
+                    model: Addition,
+                    as: 'addition',
                     required: false
                 }]
-            });
-            res.json(updatedColumns);
-        } else {
-            res.status(404).json({ message: 'Value not found' });
-        }
+            }]
+        });
+        res.json(updatedColumns);
     }  catch (error) {
         console.error('Error update value:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -285,15 +376,34 @@ app.put('/api/values/:id', async (req, res) => {
 
 app.delete('/api/values/:id', async (req, res) => {
     try {
+        const value = await Values.findByPk(req.params.id, {
+            include: [{
+                model: Addition,
+                as: 'addition',
+            }]
+        });
+
+        if (!value) {
+            return res.status(404).json({ message: 'Value not found' });
+        }
+
+        await Cells.destroy({
+            where: { valuesId: value.id }
+        })
+
         const deleted = await Values.destroy({
             where: { id: req.params.id }
         });
         if (deleted) {
             const updatedColumns = await Column.findAll({
-                order: [['createdAt', 'DESC']],
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
             });
             res.json(updatedColumns);
@@ -315,10 +425,14 @@ app.get('/api/rows', async (req, res) => {
                 as: 'cellValues',
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
-            }],
-            order: [['createdAt', 'ASC']]
+            }]
         });
         res.json(rows);
     } catch (error) {
@@ -335,7 +449,12 @@ app.post('/api/rows', async (req, res) => {
                 as: 'cellValues',
                 include: [{
                     model: Values,
-                    required: false
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
                 }]
             }]
         })
@@ -351,7 +470,12 @@ app.post('/api/rows', async (req, res) => {
                     as: 'cellValues',
                     include: [{
                         model: Values,
-                        required: false
+                        required: false,
+                        include: [{
+                            model: Addition,
+                            as: 'addition',
+                            required: false
+                        }]
                     }]
                 }]
             });
@@ -390,7 +514,12 @@ app.put('/api/rows/:id', async (req, res) => {
                         as: 'cellValues',
                         include: [{
                             model: Values,
-                            required: false
+                            required: false,
+                            include: [{
+                                model: Addition,
+                                as: 'addition',
+                                required: false
+                            }]
                         }]
                     }]
                 });
@@ -424,7 +553,12 @@ app.delete('/api/rows/:id', async (req, res) => {
                     as: 'cellValues',
                     include: [{
                         model: Values,
-                        required: false
+                        required: false,
+                        include: [{
+                            model: Addition,
+                            as: 'addition',
+                            required: false
+                        }]
                     }]
                 }]
             });
@@ -440,10 +574,11 @@ app.delete('/api/rows/:id', async (req, res) => {
 
 app.delete('/api/cells/:id', async (req, res) => {
     try {
-        console.log("cellData", req.params.id);
+        console.log("id Cell", req.params.id);
         const deleted = Cells.destroy({
             where: { id: req.params.id }
         });
+        console.log("deleted", deleted);
         if (deleted) {
             const updatedRows = await Row.findAll( {
                 include: [{
@@ -451,7 +586,12 @@ app.delete('/api/cells/:id', async (req, res) => {
                     as: 'cellValues',
                     include: [{
                         model: Values,
-                        required: false
+                        required: false,
+                        include: [{
+                            model: Addition,
+                            as: 'addition',
+                            required: false
+                        }]
                     }]
                 }]
             });
@@ -461,6 +601,78 @@ app.delete('/api/cells/:id', async (req, res) => {
         }
     } catch (error) {
         console.error('Error deleting cell:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.post('/api/addition', async (req, res) => {
+    try {
+        const { valuesId, additionValue, typeValue } = req.body;
+        if (!valuesId || !additionValue || !typeValue) {
+            return res.status(400).json({ message: 'Missing required fields: valuesId, additionValue, and type are required.' });
+        };
+
+        const currentAddition = await Addition.findOne({
+            where: {
+                valuesId: valuesId,
+                additionValue: additionValue,
+                typeValue: typeValue
+            }
+        });
+        console.log("currentAddition", currentAddition);
+        if (currentAddition) {
+            return res.status(409).json({ message: 'Addition value already exists' });
+        }
+
+        const newAddition = await Addition.create(
+            {
+                valuesId,
+                additionValue,
+                typeValue
+            }
+        );
+        console.log("newAddition", newAddition);
+        const columns = await Column.findAll({
+            include: [{
+                model: Values,
+                required: false,
+                include: [{
+                    model: Addition,
+                    as: 'addition',
+                    required: false
+                }]
+            }]
+        });
+        res.json(columns);
+    } catch (error) {
+        console.error('Error updating addition:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/api/addition/:id', async (req, res) => {
+    try {
+        const deleted = await Addition.destroy({
+            where: { id: req.params.id }
+        });
+        if (deleted) {
+            const columns = await Column.findAll({
+                include: [{
+                    model: Values,
+                    required: false,
+                    include: [{
+                        model: Addition,
+                        as: 'addition',
+                        required: false
+                    }]
+                }]
+            });
+            res.json(columns);
+        } else {
+            res.status(404).json({message: 'Addition not found'});
+        }
+    } catch (error) {
+        console.error('Error deleting addition:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

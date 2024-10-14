@@ -1,0 +1,29 @@
+.option {
+  max-width: 100%;
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &.selected_option {
+    background-color: #99CCFF;
+    color: white;
+    border: 1px solid #99CCFF;
+  }
+
+  &:hover {
+    background-color: #6699FF;
+    color: white;
+  }
+
+  input {
+    all: unset;
+    display: inherit;
+    width: 100%;
+  }
+}

@@ -3,11 +3,14 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
     columns: [],
     rows: [],
+    sortedRows: [],
     filters: {},
+    sorting: {},
     user: {
         isAuthenticated: false,
         role: null,
     },
+    openPopup: {},
     error: null,
     status: 'idle',
 };
@@ -56,9 +59,14 @@ export const tableSlice = createSlice({
             state.status = 'succeeded';
         },
 
+        setSortedRows: (state, action) => {
+            state.sortedRows = action.payload;
+        },
+
         setLoading: (state, action) => {
             state.status = action.payload;
         },
+
         setError: (state, action) => {
             state.status = 'failed';
             state.error = action.payload;
@@ -66,6 +74,27 @@ export const tableSlice = createSlice({
 
         setFilters: (state, action) => {
             state.filters = action.payload;
+        },
+
+        setSorting: (state, action) => {
+            state.sorting = action.payload;
+        },
+
+        setOpenPopup(state, action) {
+            state.openPopup = action.payload;
+        },
+
+        toggleOpenPopup: (state, action) => {
+            const tuple = action.payload;
+            if (state.openPopup[tuple] !== undefined) {
+                state.openPopup[tuple] = !state.openPopup[tuple];
+            } else {
+                state.openPopup = { [tuple]: true };
+            }
+        },
+
+        closeOpenPopup(state) {
+            state.openPopup = {};
         },
 
         login(state, action) {
@@ -85,18 +114,26 @@ export const {
     changeColumn,
     setRows,
     createRow,
+    setSortedRows,
     setLoading,
     setError,
     setFilters,
+    setSorting,
+    setOpenPopup,
+    toggleOpenPopup,
+    closeOpenPopup,
     login,
     logout
 } = tableSlice.actions;
 
 export const selectColumns = (state) => state.table.columns;
 export const selectRows = (state) => state.table.rows;
+export const selectSortedRows = (state) => state.table.sortedRows;
 export const selectStatus = (state) => state.table.status;
 export const selectError = (state) => state.table.error;
 export const selectFilters = (state) => state.table.filters;
+export const selectSorting = (state) => state.table.sorting;
+export const selectOpenPopup = (state) => state.table.openPopup;
 export const selectUser = (state) => state.table.user;
 
 export default tableSlice.reducer;

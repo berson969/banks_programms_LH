@@ -1,20 +1,19 @@
 import PropTypes from 'prop-types';
+import styles from './styles.module.scss';
 import ColumnNameInput from './ColumnNameInput';
-import ValuesList from './ValuesList';
-import AddValueInput from './AddValueInput';
+import ValuesList from './Values/ValuesList';
+
 
 function Columns({ column }) {
-    // console.log('updateColumn-Columns', column, column.id)
     return (
-        <div  className="column-view">
+        <div  className={styles.column_view} >
             <ColumnNameInput
                 id={`name-${column.id}`}
                 column={column}
             />
             <ValuesList
-                Values={column.Values}
+                column={column}
             />
-            <AddValueInput column={column} />
         </div>
     );
 }
@@ -27,7 +26,8 @@ Columns.propTypes = {
             PropTypes.shape({
                 id: PropTypes.string,
                 columnId: PropTypes.string,
-                value: PropTypes.string
+                value: PropTypes.string,
+                addition: PropTypes.array
             })
         )
     }).isRequired
