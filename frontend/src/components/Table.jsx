@@ -25,9 +25,6 @@ function Table() {
 
     // Эффект для фильтрации строк
     useEffect(() => {
-        // console.log("filters", filters)
-        // console.log("rows", rows)
-
         const newFilteredRows = Object.keys(filters).length > 0
             ? rows.filter(row =>
                 Object.keys(filters).every(columnId => {
@@ -71,7 +68,6 @@ function Table() {
             }
             return 0;
         });
-        console.log("newSortedRows", newSortedRows);
         dispatch(setSortedRows(newSortedRows));
     }, [sorting, filteredRows]);
 

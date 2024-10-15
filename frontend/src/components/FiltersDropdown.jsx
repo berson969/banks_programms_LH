@@ -1,31 +1,32 @@
-import PropTypes, {string} from "prop-types";
+import PropTypes from "prop-types";
 import styles from './styles.module.scss';
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilters, selectOpenPopup, setFilters, setOpenPopup, toggleOpenPopup} from "../slices";
+import {selectFilters, selectOpenPopup, setFilters, setOpenPopup} from "../slices";
 import {saveDataToLocalStorage} from "../../hooks/localStorageService.js";
 
 
 function FiltersDropdown({ column }) {
     const dispatch = useDispatch();
+    const filterRef = useRef(null);
     const filters = useSelector(selectFilters);
     const openPopup = useSelector(selectOpenPopup);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (openPopup && !event.target.closest('.popup')) {
-                setOpenPopup({ ['filter']: false });
+        const handleClickOutside = (e) => {
+            if (openPopup['filter'] && filterRef.current && !filterRef.current.contains(e.target)) {
+                dispatch(setOpenPopup({ ['filter']: false }));
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [openPopup]);
+    }, [openPopup, dispatch]);
 
     const handlePopupClick = (e) => {
         e.stopPropagation();
-        setOpenPopup({ ['filter']: false });
+        dispatch(setOpenPopup({ ['filter']: false }));
     };
 
     const handleCheckboxChange = (value) => {
@@ -34,7 +35,7 @@ function FiltersDropdown({ column }) {
         const updatedValues = currentFilters.includes(value)
             ? currentFilters.filter(v => v !== value)
             : [...currentFilters, value];
-        console.log("updatedValues-filters", updatedValues);
+        // console.log("updatedValues-filters", updatedValues);
         dispatch(setFilters({
             ...filters,
             [column.id]: updatedValues,
@@ -43,6 +44,7 @@ function FiltersDropdown({ column }) {
             ...filters,
             [column.id]: updatedValues,
         });
+        dispatch(setOpenPopup({ ['filter']: column.id }));
     };
 
     const checkedControl = (value) =>  {
@@ -56,7 +58,7 @@ function FiltersDropdown({ column }) {
         <div className={styles.table_header}>
             {
                 openPopup['filter'] && (
-                <div className={styles.popup} onClick={handlePopupClick}>
+                <div className={styles.popup} onClick={handlePopupClick} ref={filterRef}>
                     {column.Values.map(values => (
                         <div key={values.id} className={styles.filter_list}>
                             <label

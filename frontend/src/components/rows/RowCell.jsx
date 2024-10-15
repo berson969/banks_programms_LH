@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import PropTypes from "prop-types";
 import styles from './styles.module.scss';
 import {useDispatch, useSelector} from "react-redux";
@@ -14,6 +14,7 @@ function RowCell ({ column, row }) {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [options, setOptions] = useState([]);
     const { role } = useSelector(selectUser);
+    const popupRef = useRef(null);
     const collectTuple = [row.id, column.id];
 
     // выбор selectedOptions
@@ -25,48 +26,37 @@ function RowCell ({ column, row }) {
             .filter(cell => cell.columnId === column.id && cell.Value)
             .map(cell =>  cell.Value);
         setSelectedOptions(selectedValues);
+        console.log("selectedOptions change", options, selectedOptions);
     }, [row.cellValues, column]);
 
-    // нажатие на правую кнопку мыши
-    // useEffect(() => {
-    //     const handleRightClick = (e) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.target.closest('td')) {
-    //             dispatch(setOpenPopup({ [tuplePosition]: true }));
-    //             console.log("Popup opened for:", tuplePosition);
-    //         } else {
-    //             dispatch(closeOpenPopup());
-    //         }
-    //         console.log("🖱 Right click detected!", openPopup, e.target.closest('td'));
-    //     };
-    //     document.addEventListener('contextmenu', handleRightClick);
-    //     return () => {
-    //         document.removeEventListener('contextmenu', handleRightClick);
-    //     };
-    // }, [dispatch, openPopup, tuplePosition]);
+    // Обработчик события клика при монтировании компонента
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (popupRef.current && !popupRef.current.contains(e.target)) {
+                dispatch(closeOpenPopup());
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleClick = (e) => {
         console.log("click", e.target.closest(`.${styles.cell}`));
         if (e.target.closest(`.${styles.cell}`)) {
             console.log('Clicked on ContentCell');
             dispatch(toggleOpenPopup(collectTuple));
-
-        } else if (e.target.closest(`.${styles.options_list}`)) {
-            console.log('Clicked inside options list - popup remains open');
-
-        } else {
-            console.log('Clicked outside - closing popup');
-            dispatch(closeOpenPopup());
         }
-        console.log("click after")
     };
 
     const handleChange = (e, option) => {
         console.log("clickSelectedOption-change", option);
-        if (selectedOptions.map(setSelectedOption => setSelectedOption.value).includes(option.value)) {
+        const isSelected = selectedOptions.some(selectedOption => selectedOption.id === option.id);
+        console.log("isSelected", isSelected);
+        if (isSelected) {
             const updatedSelectedOptions = selectedOptions.filter(selectedOption => selectedOption.id !== option.id);
-            setSelectedOptions(updatedSelectedOptions);
             console.log("updatedSelectedOption-change", updatedSelectedOptions);
 
             const cellValue = row.cellValues.find(cell => cell.valuesId === option.id);
@@ -75,14 +65,11 @@ function RowCell ({ column, row }) {
                 dispatch(removeValuesFromRowAsync(cellValue));
             }
         } else {
-            setSelectedOptions([...selectedOptions, option]);
-
             const newValues = column.Values.find(value => value === option);
 
             if (newValues) {
                 const updateData = { rowId: row.id, columnId: column.id, valuesId: newValues.id };
                 dispatch(updateRowAsync(updateData));
-                // collectTuple.push('cell')
                 dispatch(setOpenPopup({ [collectTuple]: true }));
             }
         }
@@ -94,7 +81,7 @@ function RowCell ({ column, row }) {
                 <ContentCell selectedOptions={selectedOptions} collectTuple={collectTuple} />
             </div>
             {role === "admin" && openPopup[[ row.id, column.id ]] &&
-                <div className={styles.options_list}>
+                <div className={styles.options_list} ref={popupRef} >
                     {options.map(option =>
                         <div key={option.id}>
                             <OptionsPopup

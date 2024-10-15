@@ -15,6 +15,7 @@ function OptionsPopup({ rowId, option, selectedOptions, onChange }) {
     const collectTuple = [rowId, option.columnId];
 
     useEffect(() => {
+
         if (openPopup[collectTuple] && inputRef.current) {
             inputRef.current.focus();
         }
@@ -36,32 +37,24 @@ function OptionsPopup({ rowId, option, selectedOptions, onChange }) {
     }, [openPopup, collectTuple]);
 
 
-    const handleDivClick = (e) => {
+    const handleClick = (e) => {
+        e.stopPropagation();
         console.log("Div clicked"); // Проверка клика по div
         onChange(e, option); // Вызываем onChange при клике на div
-    };
-
-    const handleInputClick = (e) => {
-        console.log("Input clicked"); // Проверка клика по input
-        e.stopPropagation();
-        onChange(e, option); // Вызываем onChange при клике на input
     };
 
     return (
         <div
             className={`${styles.option} ${selectedOptions.find(opt => opt.id === option.id) ? styles.selected_option : ''}`}
-            onClick={handleDivClick}
-            // onClick={(e) => onChange(e, option)}
+            onClick={handleClick}
         >
             <input
+                id={`option-${option.id}`}
                 type="text"
-                ref={inputRef}
                 value={option.value}
                 readOnly
                 required
-                // className={styles.input_reset}
-                // onClick={(e) => e.stopPropagation()}
-                onClick={handleInputClick}
+                onClick={handleClick}
             />
         </div>
     )

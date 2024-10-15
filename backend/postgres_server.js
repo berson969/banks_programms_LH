@@ -271,7 +271,6 @@ app.delete('/api/columns/:id', async (req, res) => {
     try {
         const values = await Values.findAll({ where: { columnId: req.params.id } });
         const valueIds = values.map(value => value.id);
-
         if (valueIds.length > 0) {
             await Values.destroy({
                 where: {id: {
@@ -491,44 +490,44 @@ app.post('/api/rows', async (req, res) => {
 
 app.put('/api/rows/:id', async (req, res) => {
     try {
-
+        console.log("updatedRow", req.body);
         const { columnId, valuesId } = req.body;
 
         const updateRow = await Row.findByPk(req.params.id);
 
         if (updateRow) {
-            const [cell] = await Cells.findAll(
+            const existingCell =  await Cells.findOne(
                 { where: {
                     rowId: updateRow.id,
                     columnId: columnId,
                     valuesId: valuesId
                 }}
             );
-            if (!cell) {
-                const createCell = await Cells.create({
+            if (!existingCell) {
+                await Cells.create({
                     rowId: updateRow.id,
                     columnId,
                     valuesId
                 });
-                const updatedRows = await Row.findAll( {
+            } else {
+                return res.status(409).json({ message: 'Value already exists' });
+            }
+            const updatedRows = await Row.findAll( {
+                include: [{
+                    model: Cells,
+                    as: 'cellValues',
                     include: [{
-                        model: Cells,
-                        as: 'cellValues',
+                        model: Values,
+                        required: false,
                         include: [{
-                            model: Values,
-                            required: false,
-                            include: [{
-                                model: Addition,
-                                as: 'addition',
-                                required: false
-                            }]
+                            model: Addition,
+                            as: 'addition',
+                            required: false
                         }]
                     }]
-                });
-                res.json(updatedRows);
-            } else {
-                res.status(409).json({ message: 'Value already exits' });
-            }
+                }]
+            });
+            res.json(updatedRows);
         } else {
             res.status(404).json({ message: 'Row not found' });
         }
@@ -576,11 +575,9 @@ app.delete('/api/rows/:id', async (req, res) => {
 
 app.delete('/api/cells/:id', async (req, res) => {
     try {
-        console.log("id Cell", req.params.id);
         const deleted = Cells.destroy({
             where: { id: req.params.id }
         });
-        console.log("deleted", deleted);
         if (deleted) {
             const updatedRows = await Row.findAll( {
                 include: [{
@@ -621,7 +618,6 @@ app.post('/api/addition', async (req, res) => {
                 typeValue: typeValue
             }
         });
-        console.log("currentAddition", currentAddition);
         if (currentAddition) {
             return res.status(409).json({ message: 'Addition value already exists' });
         }
@@ -633,7 +629,7 @@ app.post('/api/addition', async (req, res) => {
                 typeValue
             }
         );
-        console.log("newAddition", newAddition);
+
         const columns = await Column.findAll({
             include: [{
                 model: Values,

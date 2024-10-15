@@ -34,7 +34,7 @@ function AdditionPopup({ values }) {
                 setError('Invalid email format');
                 return false;
             }
-        } else if (valueType === 'text') {
+        } else if (valueType === 'url') {
             const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/;
             if (!urlPattern.test(value)) {
                 setError('Invalid URL format');

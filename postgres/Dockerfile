@@ -18,5 +18,8 @@ RUN chmod +x /usr/local/bin/check_db.sh && \
     chmod 600 /root/.pgpass && \
     crontab /etc/cron.d/cronjob
 
+# Создание директории для логов
+RUN mkdir -p /var/log && chmod 755 /var/log
+
 # Запуск cron в фоновом режиме и PostgreSQL
 CMD ["bash", "-c", "cron && docker-entrypoint.sh postgres"]

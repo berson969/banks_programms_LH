@@ -5,7 +5,6 @@ import ValueInput from "../../columns/Values/ValueInput";
 
 function ContentCell ({ selectedOptions, collectTuple }) {
     // console.log("selectedOptions-contenCell", selectedOptions);
-
     return (
         <>
             {selectedOptions.length > 0  && selectedOptions.map(selectedOption => (

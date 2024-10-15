@@ -34,11 +34,11 @@ function AddValueInput ({ column }) {
     // console.log("AddValueInput ",  id)
     return (
         <form
-            id={`form-${column.id}`}
+            id={`form-${column.id}--${newValue}`}
             onSubmit={handleSubmit}
             >
             <Input
-                id={`new-value-${column.id}`}
+                id={`new-value-${column.id}-${newValue}`}
                 value={newValue}
                 description="value"
                 onChange={(e) => setNewValue(e.target.value)}

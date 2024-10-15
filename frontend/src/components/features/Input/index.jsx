@@ -21,8 +21,6 @@ function Input({ id, value, description, onChange, onKeyDown, isEditing }) {
             placeholder={`Enter new ${description}`}
             disabled={!isEditing}
             onKeyDown={onKeyDown}
-            autoFocus={isEditing}
-            ref={inputRef}
             className={styles.input}
         />
 

@@ -126,7 +126,6 @@ export const fetchRows = () => async (dispatch) => {
         const rows = await getRows();
         dispatch(setRows(rows));
         dispatch(setLoading('idle'));
-        console.log("fetchRow", rows)
     } catch (error) {
         console.error('Failed to fetch rows:', error);
         dispatch(setError(error.toString()));
@@ -137,7 +136,6 @@ export const addRowAsync = () => async (dispatch) => {
     dispatch(setLoading());
     try {
         const addedRow = await addRow();
-        console.log("addedRow", addedRow);
         if (addedRow) {
             dispatch(createRow(addedRow));
         }
