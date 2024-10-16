@@ -1,8 +1,9 @@
+import React, {useState} from "react";
 import styles from './styles.module.scss';
-import {useState} from "react";
 import PropTypes from "prop-types";
+
 import {useDispatch, useSelector} from "react-redux";
-import {selectUser, setOpenPopup} from "../../../../slices";
+import {selectColumns, selectUser, setOpenPopup} from "../../../../slices";
 import {addAdditionAsync, deleteAdditionAsync} from "../../../../thunks";
 
 import CrossButton from "../../../features/CrossButton";
@@ -10,13 +11,18 @@ import Input from "../../../features/Input";
 import AdditionContent from "./AdditionContent";
 
 
-function AdditionPopup({ values }) {
+const  AdditionPopup = React.memo(({ valuesId }) => {
     const dispatch = useDispatch();
     const { role } = useSelector(selectUser);
+    const columns = useSelector(selectColumns);
 
     const [valueAddition, setValueAddition] = useState('');
     const [valueType, setValueType] = useState('text');
     const [error, setError] = useState('');
+
+    const values = columns.find(column =>
+        column.Values.some(value => value.id === valuesId)
+    )?.Values.find(value => value.id === valuesId);
 
     const handleAdditionChange = (e) => {
         const addition = e.target.value.trim();
@@ -52,9 +58,10 @@ function AdditionPopup({ values }) {
             const isUnique = !values.addition.some(addition =>
                 addition.additionValue === valueAddition && addition.typeValue === valueType
             );
+            // console.log("isUnique", isUnique);
             if (!isUnique) return setError('Put not unique value');
             const additionContent = {
-                valuesId: values.id,
+                valuesId: valuesId,
                 additionValue: valueAddition,
                 typeValue: valueType
             };
@@ -123,22 +130,11 @@ function AdditionPopup({ values }) {
             </div>
         </div>
     );
-}
+});
 
 AdditionPopup.propTypes = {
-    values: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        columnId: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
-        addition: PropTypes.arrayOf(
-            PropTypes.shape({
-                id: PropTypes.string,
-                valuesId: PropTypes.string,
-                additionValue: PropTypes.string,
-                typeValue: PropTypes.string,
-            })
-        ),
-    }).isRequired,
+    valuesId: PropTypes.string.isRequired
 };
 
+AdditionPopup.displayName = "AdditionPopup";
 export default AdditionPopup;

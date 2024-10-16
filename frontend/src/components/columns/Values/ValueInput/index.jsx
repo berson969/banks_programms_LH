@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import  {useEffect} from 'react';
 import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 import { useRef, useState} from "react";
@@ -11,7 +11,7 @@ import Buttons from "./Buttons";
 import Input from "../../../features/Input";
 
 
-const ValueInput = React.memo( ({ values, collectTuple, ind }) => {
+function ValueInput ({ values, collectTuple, ind }) {
     const dispatch = useDispatch();
     const openPopup = useSelector(selectOpenPopup);
     const inputRef = useRef(null);
@@ -64,10 +64,10 @@ const ValueInput = React.memo( ({ values, collectTuple, ind }) => {
                     />
                 <Buttons id={values.id} ind={ind} collectTuple={collectTuple}  onEditValue={handleEditValue} />
             </form>
-            {openPopup[[...collectTuple, ind]] && <AdditionPopup values={values} />}
+            {openPopup[[...collectTuple, ind]] && <AdditionPopup valuesId={values.id} />}
          </div>
     );
-});
+}
 
 ValueInput.propTypes = {
     values: PropTypes.shape({
@@ -87,5 +87,4 @@ ValueInput.propTypes = {
     ind: PropTypes.string.isRequired,
 };
 
-ValueInput.displayName = "ValueInput";
 export default ValueInput;

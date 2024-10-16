@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import styles from './styles.module.scss';
 import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilters, selectOpenPopup, setFilters, setOpenPopup} from "../slices";
+import {closeOpenPopup, selectFilters, selectOpenPopup, setFilters, setOpenPopup} from "../slices";
 import {saveDataToLocalStorage} from "../../hooks/localStorageService.js";
 
 
@@ -15,7 +15,7 @@ function FiltersDropdown({ column }) {
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (openPopup['filter'] && filterRef.current && !filterRef.current.contains(e.target)) {
-                dispatch(setOpenPopup({ ['filter']: false }));
+                dispatch(closeOpenPopup());
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -26,7 +26,7 @@ function FiltersDropdown({ column }) {
 
     const handlePopupClick = (e) => {
         e.stopPropagation();
-        dispatch(setOpenPopup({ ['filter']: false }));
+        dispatch(closeOpenPopup());
     };
 
     const handleCheckboxChange = (value) => {

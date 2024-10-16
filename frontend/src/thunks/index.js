@@ -188,9 +188,8 @@ export const removeValuesFromRowAsync = (cellData) => async (dispatch) => {
 export const addAdditionAsync = (addition) => async (dispatch) => {
     dispatch(setLoading('loading'));
     try {
-        const columns = await addAddition(addition);  // console.log("adding addition", columns);
+        const columns = await addAddition(addition);
         dispatch(setColumns(columns));
-
         dispatch(setLoading('idle'));
     } catch  (error) {
         dispatch(setLoading('error'));

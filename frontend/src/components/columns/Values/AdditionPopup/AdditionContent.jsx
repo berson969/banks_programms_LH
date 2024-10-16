@@ -1,7 +1,9 @@
+import React from "react";
 import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 
-function AdditionContent({ addition }) {
+
+const  AdditionContent = React.memo(({ addition }) => {
     const { typeValue, additionValue } = addition;
 
     const renderField = () => {
@@ -44,7 +46,7 @@ function AdditionContent({ addition }) {
             {renderField()}
         </div>
     );
-}
+});
 
 AdditionContent.propTypes = {
     addition: PropTypes.shape({
@@ -52,4 +54,6 @@ AdditionContent.propTypes = {
         additionValue: PropTypes.string.isRequired
     }).isRequired
 }
+
+AdditionContent.displayName = "AdditionContent";
 export default AdditionContent;
