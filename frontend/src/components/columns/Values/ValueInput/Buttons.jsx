@@ -20,7 +20,6 @@ function Buttons({ id, ind, collectTuple, onEditValue }) {
     const handleAdditionDetail = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Addition detail", collectTuple, ind);
         if (openPopup[[...collectTuple, ind]]) {
             dispatch(closeOpenPopup());
         } else {

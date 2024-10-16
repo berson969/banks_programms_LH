@@ -21,7 +21,6 @@ function AdditionContent({ addition }) {
                         absoluteUrl = `https://${additionValue}`;
                     }
                     const parsedUrl = new URL(absoluteUrl);
-                    console.log("parsedUrl", parsedUrl, parsedUrl.protocol, parsedUrl.host);
                     return (
                         <a
                             href={parsedUrl.href}

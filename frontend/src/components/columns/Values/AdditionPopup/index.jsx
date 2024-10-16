@@ -114,7 +114,7 @@ function AdditionPopup({ values }) {
                             id={`new-addition-${values.id}`}
                             value={valueAddition}
                             description="addition value"
-                            onChange={(e) => setValueAddition(e.target.value)}
+                            onChange={handleAdditionChange}
                             onKeyDown={handleKeyDown}
                             isEditing={true}
                         />

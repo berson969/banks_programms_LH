@@ -26,7 +26,7 @@ function RowCell ({ column, row }) {
             .filter(cell => cell.columnId === column.id && cell.Value)
             .map(cell =>  cell.Value);
         setSelectedOptions(selectedValues);
-        console.log("selectedOptions change", options, selectedOptions);
+        // console.log("selectedOptions change", options, selectedOptions);
     }, [row.cellValues, column]);
 
     // Обработчик события клика при монтировании компонента
@@ -46,15 +46,14 @@ function RowCell ({ column, row }) {
     const handleClick = (e) => {
         console.log("click", e.target.closest(`.${styles.cell}`));
         if (e.target.closest(`.${styles.cell}`)) {
-            console.log('Clicked on ContentCell');
             dispatch(toggleOpenPopup(collectTuple));
         }
     };
 
     const handleChange = (e, option) => {
-        console.log("clickSelectedOption-change", option);
+        // console.log("clickSelectedOption-change", option);
         const isSelected = selectedOptions.some(selectedOption => selectedOption.id === option.id);
-        console.log("isSelected", isSelected);
+        // console.log("isSelected", isSelected);
         if (isSelected) {
             const updatedSelectedOptions = selectedOptions.filter(selectedOption => selectedOption.id !== option.id);
             console.log("updatedSelectedOption-change", updatedSelectedOptions);
