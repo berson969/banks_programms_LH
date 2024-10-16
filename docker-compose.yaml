@@ -10,8 +10,9 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - ./home/berson/postgres_data:/var/lib/postgresql/data
-            - ./backups:/backups
+            - ../postgres_data:/var/lib/postgresql/data
+            - ../backups:/backups
+            - ../logs:/var/log
 
     backend:
         build:
@@ -48,4 +49,4 @@ services:
 
 volumes:
     postgres_data:
-    backups_data:
+

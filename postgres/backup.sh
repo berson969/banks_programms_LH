@@ -1,8 +1,8 @@
 #!/bin/bash
+
 DB_NAME="table-db"
 DB_USER="some_user"
-DB_HOST="localhost" //!!! for docker postgres
-BACKUP_DIR="/backups"
+DB_HOST="postgres" # для сервера postgres в двух местах
 DATE=$(date +%Y%m%d-%H%M%S)
 BACKUP_FILE="/backups/postgres_backup_$DATE.sql.gz"
 LOG_DIR="/var/log"
