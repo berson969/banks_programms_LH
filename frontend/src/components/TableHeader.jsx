@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import styles from './styles.module.scss';
-import {closeOpenPopup, selectColumns, selectOpenPopup, selectStatus, setOpenPopup } from "../slices";
+import {closeOpenPopup, selectColumns, selectFilters, selectOpenPopup, selectStatus, setOpenPopup} from "../slices";
 import FiltersDropdown from "./FiltersDropdown";
 import SortingButton from "./SortingButton";
 
@@ -8,6 +8,7 @@ import SortingButton from "./SortingButton";
 function TableHeader() {
     const dispatch = useDispatch();
     const columns = useSelector(selectColumns);
+    const filters = useSelector(selectFilters);
     const status = useSelector(selectStatus);
     const openPopup = useSelector(selectOpenPopup);
 
@@ -28,7 +29,7 @@ function TableHeader() {
             <tr>
             {columns.map(column => (
                 <th key={column.id}
-                    className={styles.title}
+                    className={`${styles.title} ${Object.keys(filters).includes(column.id) ? styles.filter_active : ''}`}
                     onClick={(e) => handleColumnClick(e, column.id)}
                 >
                     {column.name}

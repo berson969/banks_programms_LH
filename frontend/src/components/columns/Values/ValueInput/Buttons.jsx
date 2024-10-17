@@ -8,7 +8,7 @@ import EditButton from "../../../features/EditButton";
 import CrossButton from "../../../features/CrossButton";
 
 
-function Buttons({ id, ind, collectTuple, onEditValue }) {
+function Buttons({ id, collectTuple, onEditValue }) {
     const dispatch = useDispatch();
     const openPopup = useSelector(selectOpenPopup);
 
@@ -20,22 +20,22 @@ function Buttons({ id, ind, collectTuple, onEditValue }) {
     const handleAdditionDetail = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (openPopup[[...collectTuple, ind]]) {
+        if (openPopup[[...collectTuple, "column"]]) {
             dispatch(closeOpenPopup());
         } else {
-            dispatch(setOpenPopup({ [[...collectTuple, ind]]: true }));
+            dispatch(setOpenPopup({ [[...collectTuple, "column"]]: true }));
         }
 
     };
 
     return (
         <div className={styles.buttons}>
-            {ind === 'column' && <EditButton
+            <EditButton
                 onEditValue={onEditValue}
-                sign="v"/>}
-            {ind === 'column' && <CrossButton
+                sign="v"/>
+            <CrossButton
                 onRemoveValue={(e) => handleRemoveValue(e, id)}
-                index={id}/>}
+                index={id}/>
             <EditButton
                 onEditValue={handleAdditionDetail}
                 sign="A"/>
@@ -45,7 +45,6 @@ function Buttons({ id, ind, collectTuple, onEditValue }) {
 
 Buttons.propTypes = {
     id: PropTypes.string.isRequired,
-    ind: PropTypes.string.isRequired,
     collectTuple: PropTypes.array.isRequired,
     onEditValue: PropTypes.func.isRequired,
 }

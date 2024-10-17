@@ -1,5 +1,13 @@
 .cell {
-  width: inherit;
+  max-width: 580px;
+  min-width: 100px;
+  width: 100%;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.cell_contents {
+    width: fit-content;
 }
 
 .options_list {

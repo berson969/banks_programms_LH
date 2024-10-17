@@ -87,7 +87,7 @@ export const tableSlice = createSlice({
         toggleOpenPopup: (state, action) => {
             const tuple = action.payload;
             const len = Object.keys(state.openPopup).length;
-            if (state.openPopup[tuple] !== undefined && len === 1) {
+            if (state.openPopup[tuple] !== undefined && len > 0) {
                 state.openPopup[tuple] = !state.openPopup[tuple];
             } else if (len === 0) {
                 state.openPopup = {

@@ -28,6 +28,10 @@
   white-space: nowrap;
 }
 
+.filter_active {
+  color: #646cff;
+}
+
 .filter_list {
   display: flex;
   align-items: start;
@@ -35,7 +39,7 @@
 
 .label_filter {
   max-width: 280px;
-  /*box-sizing: border-box;*/
+  color: #000000;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -51,15 +55,21 @@
 }
 
 .clear_filters {
+  width: 95%;
+  margin: 0 auto;
+
+}
+
+.clear_filters__content {
   color: blue;
   text-decoration: underline;
   cursor: pointer;
   font-size: xx-small;
   font-style: italic;
-  text-align: center;
+  text-align: left;
 }
 
-.clear_filters:hover {
+.clear_filters__content:hover {
   color: #646cff;
 }
 

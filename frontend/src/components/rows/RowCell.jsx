@@ -32,6 +32,7 @@ function RowCell ({ column, row }) {
     // Обработчик события клика при монтировании компонента
     useEffect(() => {
         const handleClickOutside = (e) => {
+            console.log("popupRef", e.target );
             if (popupRef.current && !popupRef.current.contains(e.target)) {
                 dispatch(closeOpenPopup());
             }
@@ -44,9 +45,10 @@ function RowCell ({ column, row }) {
     }, []);
 
     const handleClick = (e) => {
-        console.log("click", e.target.closest(`.${styles.cell}`));
+        console.log("click", e.target.closest(`.${styles.cell}`), openPopup);
         if (e.target.closest(`.${styles.cell}`)) {
             dispatch(toggleOpenPopup(collectTuple));
+            // console.log("openPopup", openPopup, collectTuple);
         }
     };
 
@@ -73,23 +75,22 @@ function RowCell ({ column, row }) {
             }
         }
     };
-    // console.log("openPopup", openPopup );
+    // console.log("openPopup", openPopup, collectTuple );
     return (
         <td className={styles.cell} onClick={handleClick} >
-            <div>
+            <div className={styles.cell_contents}>
                 <ContentCell selectedOptions={selectedOptions} collectTuple={collectTuple} />
             </div>
-            {role === "admin" && openPopup[[ row.id, column.id ]] &&
+            {role === "admin" && openPopup[collectTuple] &&
                 <div className={styles.options_list} ref={popupRef} >
                     {options.map(option =>
-                        <div key={option.id}>
-                            <OptionsPopup
-                                rowId={row.id}
-                                option={option}
-                                selectedOptions={selectedOptions}
-                                onChange={handleChange}
-                            />
-                        </div>
+                        <OptionsPopup
+                            key={option.id}
+                            rowId={row.id}
+                            option={option}
+                            selectedOptions={selectedOptions}
+                            onChange={handleChange}
+                        />
                     )}
                 </div>
             }

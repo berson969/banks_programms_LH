@@ -2,10 +2,9 @@
 import { useEffect } from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import styles from './styles.module.scss';
-// import './App.cssввв';
 
 import {fetchColumns, fetchRows} from './thunks';
-import {login, logout, selectColumns, selectError, selectStatus, selectUser, setLoading} from "./slices";
+import {login, logout, selectColumns, selectStatus, selectUser, setLoading} from "./slices";
 
 import Table from "./components/Table";
 import Columns from "./components/columns/Columns";
@@ -18,7 +17,6 @@ function App() {
   const dispatch = useDispatch();
   const columns = useSelector(selectColumns);
   const status = useSelector(selectStatus);
-  const error = useSelector(selectError);
   const user = useSelector(selectUser);
   const { isAuthenticated, role } = user;
 
@@ -68,7 +66,7 @@ function App() {
                   />
               ))}
             </div>}
-        {isAuthenticated && role === "admin" && <TableControls />}
+        {isAuthenticated &&  <TableControls />}
         {isAuthenticated && <ClearFilters />}
         {isAuthenticated  && columns && columns.length > 0 && <Table columns={columns} />}
       </div>

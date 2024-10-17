@@ -1,26 +1,27 @@
 .value {
+  width: fit-content;
   max-width: 450px;
   height: 24px;
   min-height: 24px;
-  white-space: normal;
   overflow-wrap: break-word;
   font-size: 16px;
-  line-height: 12px;
-}
-
-.value:hover, .value:active {
-  text-decoration: underline;
-  cursor: pointer;
-  font-style: italic;
+  line-height: 24px;
   color: blue;
-}
-
-.cell_value {
-  max-width: 500px;
-}
-
-.cell_content {
+  text-decoration: underline;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.value:hover, .value:active {
+  cursor: context-menu;
+  font-style: italic;
+}
+
+.cell_value {
+  width: fit-content;
+}
+
+.cell_content {
+  position: relative;
 }

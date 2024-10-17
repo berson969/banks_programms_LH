@@ -5,7 +5,7 @@ $popup-text: #2F4F4F;
 
 .popup {
   position: absolute;
-  top: 36px;
+  top: 24px;
   left: 20px;
   margin: 0 auto;
   background-color: $popup-color;
@@ -17,8 +17,12 @@ $popup-text: #2F4F4F;
   padding: 15px;
 
   .title {
+    margin: 0 10px;
     font-weight: bold;
     text-decoration: underline;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .popup_content {

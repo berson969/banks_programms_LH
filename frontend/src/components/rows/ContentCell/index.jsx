@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
-import styles from "./styles.module.scss";
-import ValueInput from "../../columns/Values/ValueInput";
+import CellInput from "./CellInput";
 
 
 function ContentCell ({ selectedOptions, collectTuple }) {
@@ -8,18 +7,11 @@ function ContentCell ({ selectedOptions, collectTuple }) {
     return (
         <>
             {selectedOptions.length > 0  && selectedOptions.map(selectedOption => (
-                <div  key={`cell-content-${selectedOption.id}`} className={styles.cell_value}>
-                    {selectedOption.addition.length > 0
-                        ?   <ValueInput
-                                values={selectedOption}
-                                collectTuple={collectTuple}
-                                ind="cell"
-                        />
-                        :   <div className={styles.cell_content}>
-                            {selectedOption.value}
-                        </div>
-                    }
-                </div>
+                <CellInput
+                    values={selectedOption}
+                    collectTuple={collectTuple}
+                    key={`cell-content-${selectedOption.id}`}
+                />
             ))}
         </>
     );

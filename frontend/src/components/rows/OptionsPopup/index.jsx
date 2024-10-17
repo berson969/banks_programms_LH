@@ -48,14 +48,13 @@ function OptionsPopup({ rowId, option, selectedOptions, onChange }) {
             className={`${styles.option} ${selectedOptions.find(opt => opt.id === option.id) ? styles.selected_option : ''}`}
             onClick={handleClick}
         >
-            <input
+            <div
                 id={`option-${option.id}`}
-                type="text"
-                value={option.value}
-                readOnly
-                required
                 onClick={handleClick}
-            />
+                className={styles.option_content}
+            >
+                {option.value}
+            </div>
         </div>
     )
 }

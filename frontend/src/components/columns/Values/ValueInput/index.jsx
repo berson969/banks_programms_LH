@@ -11,7 +11,7 @@ import Buttons from "./Buttons";
 import Input from "../../../features/Input";
 
 
-function ValueInput ({ values, collectTuple, ind }) {
+function ValueInput ({ values, collectTuple }) {
     const dispatch = useDispatch();
     const openPopup = useSelector(selectOpenPopup);
     const inputRef = useRef(null);
@@ -26,7 +26,7 @@ function ValueInput ({ values, collectTuple, ind }) {
     }, [isEditing]);
 
     const handleChangeValue = (e) => {
-        const newValue = e.target.value.trim();
+        const newValue = e.target.value;
         setValueInput(newValue);
     };
 
@@ -52,7 +52,7 @@ function ValueInput ({ values, collectTuple, ind }) {
     };
 
     return (
-        <div className={`${styles.input_values} ${ind === 'cell' ? styles.cell_border : ''}`}>
+        <div className={styles.input_values}>
             <form key={`values-${values.id}`} onSubmit={handleEditValue}>
                 <Input
                     id={values.id}
@@ -62,9 +62,9 @@ function ValueInput ({ values, collectTuple, ind }) {
                     onKeyDown={handleKeyDown}
                     isEditing={isEditing}
                     />
-                <Buttons id={values.id} ind={ind} collectTuple={collectTuple}  onEditValue={handleEditValue} />
+                <Buttons id={values.id} collectTuple={collectTuple}  onEditValue={handleEditValue} />
             </form>
-            {openPopup[[...collectTuple, ind]] && <AdditionPopup valuesId={values.id} />}
+            {openPopup[[...collectTuple, "column"]] && <AdditionPopup valuesId={values.id} />}
          </div>
     );
 }
@@ -83,8 +83,7 @@ ValueInput.propTypes = {
             })
         ),
     }).isRequired,
-    collectTuple: PropTypes.array,
-    ind: PropTypes.string.isRequired,
+    collectTuple: PropTypes.array
 };
 
 export default ValueInput;

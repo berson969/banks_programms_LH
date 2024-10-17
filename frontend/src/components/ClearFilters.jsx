@@ -14,12 +14,14 @@ function ClearFilters() {
     }
 
     return (
-        <a
-            className={styles.clear_filters}
-            onClick={handleClearFilters}
-        >
-            Clear all filters
-        </a>
+        <div className={styles.clear_filters}>
+            <a
+                className={styles.clear_filters__content}
+                onClick={handleClearFilters}
+            >
+                Clear all filters
+            </a>
+        </div>
     );
 }
 
